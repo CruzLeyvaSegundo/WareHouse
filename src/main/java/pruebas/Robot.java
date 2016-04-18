@@ -94,7 +94,10 @@ public class Robot {
         if (x == 14)
         {
             if (z != 44)
+            {
                 direccion.inicio(0.0f, 0.0f, -1.0f);
+                miRotacion=90.0f;
+            }
             else {
                 direccion.inicio(1.0f, 0.0f, 0.0f);
                 miRotacion = -90.0f;
@@ -169,7 +172,7 @@ public class Robot {
     {
         modelMatrix.push();    
         modelMatrix.translate(posicion.x,posicion.y,posicion.z);
-                modelMatrix.scale(0.8f, 0.8f, 0.8f);
+        modelMatrix.scale(0.6f, 0.6f, 0.6f);
         /*if (enRetroceso)
              motor.avanzar(-miRotacion, enRetroceso);
        else*/
@@ -178,8 +181,8 @@ public class Robot {
         
         posHorquilla.inicio(posicion.x, posicion.y,posicion.z);
         modelMatrix.push();
-        modelMatrix.translate(posHorquilla.x,posHorquilla.y,posHorquilla.z);
-        horq.avanzar(miRotacion, tengoCaja);
+        modelMatrix.translate(posHorquilla.x,posHorquilla.y,posHorquilla.z+0.1f);
+        horq.avanzar(-360.0f, tengoCaja);
         modelMatrix.pop();
 
 
@@ -328,18 +331,22 @@ public class Robot {
             if (atras)
                 modelMatrix.rotate(-alfa, 0, 1, 0);
             else
-                modelMatrix.rotate(alfa, 0, 1, 0);      
+                modelMatrix.rotate(alfa, 0, 1, 0);    
+            modelMatrix.translate(0,0.4f,0);
             modelMatrix.bind();
             eje.draw();
             modelMatrix.pop();
             
             modelMatrix.push();
+            modelMatrix.scale(1.7f, 1.7f, 1.7f);
+            modelMatrix.translate(0,1.2f,0);
             modelMatrix.bind();
             tubo.draw();
             modelMatrix.pop();
 
             modelMatrix.push();
-            modelMatrix.translate(-0.8f,0.4f,-0.8f);
+            modelMatrix.scale(0.4f, 0.4f, 0.4f);
+            modelMatrix.translate(-1.3f,-1.0f,-1.3f);
             modelMatrix.rotate(alfa, 0, 1, 0);
             modelMatrix.rotate(-giro, 1, 0, 0);
             modelMatrix.bind();
@@ -347,7 +354,8 @@ public class Robot {
             modelMatrix.pop();
 
             modelMatrix.push();
-            modelMatrix.translate(-0.8f, 0.4f, 0.8f);
+            modelMatrix.scale(0.4f, 0.4f, 0.4f);
+            modelMatrix.translate(-1.3f,-1.0f,1.3f);
             modelMatrix.rotate(alfa, 0, 1, 0);
             modelMatrix.rotate(-giro, 1, 0, 0);
             modelMatrix.bind();
@@ -355,7 +363,8 @@ public class Robot {
             modelMatrix.pop();
 
             modelMatrix.push();
-            modelMatrix.translate(0.8f,0.4f,0.8f);
+            modelMatrix.scale(0.4f, 0.4f, 0.4f);
+            modelMatrix.translate(1.3f,-1.0f,1.3f);
             modelMatrix.rotate(alfa, 0, 1, 0);
             modelMatrix.rotate(-giro, 1, 0, 0);
             modelMatrix.bind();
@@ -363,13 +372,13 @@ public class Robot {
             modelMatrix.pop();
 
             modelMatrix.push();
-            modelMatrix.translate(0.8f, 0.4f, -0.8f);
+            modelMatrix.scale(0.4f, 0.4f, 0.4f);
+            modelMatrix.translate(1.3f,-1.0f,-1.3f);
             modelMatrix.rotate(alfa, 0, 1, 0);
             modelMatrix.rotate(-giro, 1, 0, 0);
             modelMatrix.bind();
             rueda.draw();
             modelMatrix.pop();
-
             giro += angulo;
         }
     }
@@ -400,6 +409,7 @@ public class Robot {
         {
             modelMatrix.push();
             modelMatrix.rotate(alfa, 0, 1, 0);
+            modelMatrix.translate(0,1.0f, -0.4f);
             modelMatrix.bind();
             horquilla.draw();
             /*if (conCaja)
