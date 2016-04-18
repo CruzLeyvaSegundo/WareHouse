@@ -44,10 +44,13 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   private float omega;
   private int height;
   private int width;
-  private int LADO = 10;
+  private Punto posIni;
+  private Punto posFin;
   private int LARGO = 47;
   private int ANCHO = 28;
   private int ALTURA = 3;
+  private int nRobot=1;
+  private Robot[] robot;
   private String[][] local;
    public Scene03() 
    {
@@ -56,27 +59,28 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
         modelMatrix = new Matrix4();
         projectionMatrix = new Matrix4();
         viewMatrix = new Matrix4();
-
         caja = new JWavefrontObject(new File("./warehouse/caja.obj"));
         pared = new JWavefrontObject(new File("./warehouse/pared.obj"));
         base = new JWavefrontObject(new File("./warehouse/base.obj"));
         estante = new JWavefrontObject(new File("./warehouse/estante.obj"));
+        robot= new Robot[nRobot];
         light = new Light();
         alpha = 0;
         beta = 0;
         omega=0;
-        delta = 5;
+        posIni=new Punto(14,0,30);
+        posFin=new Punto(14,0,30);
         this.local = new String[][]{
                             {
                                 "============================",
                                 "=||||||||||||||||||||||||||=",
                                 "=|........................|=",
                                 "=|.||||..||||..||||..||||.|=",
-                                "=|..  ....  ....  ....00..|=",
-                                "=|..  ....  ....  ....00..|=",
-                                "=|..  ....  ....  ....00..|=",
-                                "=|..  ....  ....  ....00..|=",
-                                "=|..  ....  ....  ....00..|=",
+                                "=|..  ....  ....  ....  ..|=",
+                                "=|..  ....  ....  ....  ..|=",
+                                "=|..  ....  ....  ....  ..|=",
+                                "=|..  ....  ....  ....  ..|=",
+                                "=|..  ....  ....  ....  ..|=",
                                 "=|.||||..||||..||||..||||.|=",
                                 "=|........................|=",
                                 "=|.||||..||||..||||..||||.|=",
@@ -242,6 +246,8 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     viewMatrix.init(gl, shader.getUniformLocation("u_viewMatrix"));
 
     try {
+      //init robot
+      Robot.initRobot(gl, shader,modelMatrix,local);
       //init the model caja
       caja.init(gl, shader);
       caja.unitize();
@@ -272,20 +278,19 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     light.setDiffuseColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f });
     light.setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f });
     light.init(gl, shader);
+     // Fuente de luz
+    light.bind();
     
+    crearRobots();
+ 
   }
- public class Punto
+
+ private void crearRobots()
  {
-    float x;
-    float y;
-    float z;
-    Punto(float xo,float yo,float zo)
-    {
-        x=xo;
-        y=yo;
-        z=zo;
-    }
- };
+     robot[0]=new Robot(0,14.0f,30.0f);
+     System.out.println("letra POS ROBOT: "+(local[0][30].toCharArray())[14]);
+
+ }
  public void guardarMedidas(int x,int y)
  {
      this.width=x;
@@ -351,11 +356,11 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
             for (i = 0 ; i < LARGO ; i++)
                 for (j = 0 ; j < ANCHO ; j++)
                     if (local[k][i].charAt(j) == '0' || local[k][i].charAt(j) == '2') {
-                        drawCaja(j, k, i);;
+                        drawCaja(j, k, i);
                         if (i < 30)
                         drawEstante(j, k, i);;
                     }
-                    else if (local[k][i].charAt(j)== ' ' || local[k][i].charAt(j) == '1' || local[k][i].charAt(j) == '2')
+                    else if (local[k][i].charAt(j)== ' ' || local[k][i].charAt(j) == '1')
                         drawEstante(j, k, i);
                     else if (local[k][i].charAt(j) == '=')
                             {
@@ -389,12 +394,13 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     mirarA(new Punto(14+alpha,12+beta,48+omega),new Punto(14+alpha,2+beta,33+omega));
     viewMatrix.bind();
    
-    // Fuente de luz
-    light.bind();
+ 
     
     //Dibujo de escena Almacen
     modelMatrix.loadIdentity();
     cargarLocal();
+    //for (int i = 0 ; i < nRobot ; i++)
+    robot[0].actuar(posFin);
     /*
     modelMatrix.rotate(beta, 0, 1.0f, 0);
     modelMatrix.rotate(alpha, 1.0f, 0, 0);
@@ -415,6 +421,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     pared.dispose();
     base.dispose();
     estante.dispose();
+    Robot.dispose();
   }
   public KeyListener escucha() {
      KeyListener listener= new KeyListener(){
@@ -450,9 +457,10 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                 case 'x'://
                   beta = beta - 1;
                   break;
-                /*case '8'://
-                  omega = omega - 1;
+                case '8':
+                  posFin.z-=1;
                   break;
+                    /*
                 case '2'://
                   omega = omega + 1;
                   break;
@@ -477,5 +485,4 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
      };
      return listener;
   }
-
 }

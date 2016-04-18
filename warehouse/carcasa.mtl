@@ -1,0 +1,11 @@
+# Blender MTL File: 'carcasa.blend'
+# Material Count: 1
+
+newmtl Material
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.695108 0.007947 0.013127
+Ks 0.448546 0.002557 0.005881
+Ni 1.000000
+d 1.000000
+illum 2
