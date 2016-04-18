@@ -200,57 +200,14 @@ public class Robot {
         }
         else
             sumar(posicion, avance, direccion);
-        
-    }
-    public boolean desplazar(Punto ini, Punto ir)
-    {
-        modelMatrix.push();    
-        modelMatrix.translate(posicion.x,posicion.y,posicion.z);
-        if (enRetroceso)
-             motor.avanzar(-miRotacion, enRetroceso);
-       else
-             motor.avanzar(miRotacion, enRetroceso);
-        modelMatrix.pop();
-        
-        posHorquilla.inicio(posicion.x, posicion.y,posicion.z);
-        modelMatrix.push();
-        modelMatrix.translate(posHorquilla.x,posHorquilla.y,posHorquilla.z);
-        horq.avanzar(miRotacion, tengoCaja);
-        modelMatrix.pop();
-
-        sumar(posicion, avance, direccion);
-
-        if (!(  ((ini.x <= posicion.x && posicion.x <= ir.x) || (ir.x <= posicion.x && posicion.x <= ini.x)) &&
-                ((ini.y <= posicion.y && posicion.y <= ir.y) || (ir.y <= posicion.y && posicion.y <= ini.y)) &&
-                ((ini.z <= posicion.z && posicion.z <= ir.z) || (ir.z <= posicion.z && posicion.z <= ini.z))
-            ))
-        {
-
-            if (enRetroceso)
-            {
-                direccion = mult(-1, direccion);
-                enRetroceso = false;
-                alto = 0;
-                seBaja = true;
-            }
-
-            posicion = ir;
-
-        }
-
-
+        /*
         if (posicion.z != 26)
             vista.inicio(posicion.x + 1.5f * miColocarX, posicion.y + 1.25f, posicion.z + 3);
         else
             if (posicion.z < 28)
                 vista.inicio(posicion.x + 3 * miColocarX, posicion.y + 1.25f, posicion.z);
             else
-                vista.inicio(12,1.25f,33);
-
-        return true;
-    }
-    public void actuar()
-    {
+                vista.inicio(12,1.25f,33);*/
         
     }
     static void dispose(){
@@ -332,21 +289,21 @@ public class Robot {
                 modelMatrix.rotate(-alfa, 0, 1, 0);
             else
                 modelMatrix.rotate(alfa, 0, 1, 0);    
-            modelMatrix.translate(0,0.4f,0);
+            modelMatrix.translate(0,0.3f,0.0f);
             modelMatrix.bind();
             eje.draw();
             modelMatrix.pop();
             
             modelMatrix.push();
-            modelMatrix.scale(1.7f, 1.7f, 1.7f);
-            modelMatrix.translate(0,1.2f,0);
+            modelMatrix.scale(2.0f,2.5f, 2.00f);
+            modelMatrix.translate(0,1f,0);
             modelMatrix.bind();
             tubo.draw();
             modelMatrix.pop();
 
             modelMatrix.push();
             modelMatrix.scale(0.4f, 0.4f, 0.4f);
-            modelMatrix.translate(-1.3f,-1.0f,-1.3f);
+            modelMatrix.translate(-1.3f,-1.3f,-1.3f);
             modelMatrix.rotate(alfa, 0, 1, 0);
             modelMatrix.rotate(-giro, 1, 0, 0);
             modelMatrix.bind();
@@ -355,7 +312,7 @@ public class Robot {
 
             modelMatrix.push();
             modelMatrix.scale(0.4f, 0.4f, 0.4f);
-            modelMatrix.translate(-1.3f,-1.0f,1.3f);
+            modelMatrix.translate(-1.3f,-1.3f,1.3f);
             modelMatrix.rotate(alfa, 0, 1, 0);
             modelMatrix.rotate(-giro, 1, 0, 0);
             modelMatrix.bind();
@@ -364,7 +321,7 @@ public class Robot {
 
             modelMatrix.push();
             modelMatrix.scale(0.4f, 0.4f, 0.4f);
-            modelMatrix.translate(1.3f,-1.0f,1.3f);
+            modelMatrix.translate(1.3f,-1.3f,1.3f);
             modelMatrix.rotate(alfa, 0, 1, 0);
             modelMatrix.rotate(-giro, 1, 0, 0);
             modelMatrix.bind();
@@ -373,7 +330,7 @@ public class Robot {
 
             modelMatrix.push();
             modelMatrix.scale(0.4f, 0.4f, 0.4f);
-            modelMatrix.translate(1.3f,-1.0f,-1.3f);
+            modelMatrix.translate(1.3f,-1.3f,-1.3f);
             modelMatrix.rotate(alfa, 0, 1, 0);
             modelMatrix.rotate(-giro, 1, 0, 0);
             modelMatrix.bind();
@@ -409,7 +366,7 @@ public class Robot {
         {
             modelMatrix.push();
             modelMatrix.rotate(alfa, 0, 1, 0);
-            modelMatrix.translate(0,1.0f, -0.4f);
+            modelMatrix.translate(0,1.0f, -0.7f);
             modelMatrix.bind();
             horquilla.draw();
             /*if (conCaja)
