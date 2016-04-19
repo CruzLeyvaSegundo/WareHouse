@@ -36,31 +36,37 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   private final Matrix4 projectionMatrix;
   private final Matrix4 viewMatrix;
   
+  //Piso
   private final SimpleModel square;
   private static float[] QUAD_VERTICES;
   int dist = 5;
   private final Material material;
   
+  //Local
   private final JWavefrontObject caja;
   private final JWavefrontObject pared;
   private final JWavefrontObject base;
   private final JWavefrontObject estante;  
+  
   private final Light light;
+  private final String[][] local;
   private float alpha;
   private float beta;
   private float delta;
-  private final float omega;
   private int height;
   private int width;
   private Punto vista;
   private Punto dir;
   private final Punto posFin;
+  
   private final int LARGO = 47;
   private final int ANCHO = 29;
   private final int ALTURA = 3;
+  
+  //Robot
   private final int nRobot=1;
   private final Robot[] robot;
-  private final String[][] local;
+
    public Scene03() 
    {
         // Carrega os shaders
@@ -68,17 +74,20 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
         modelMatrix = new Matrix4();
         projectionMatrix = new Matrix4();
         viewMatrix = new Matrix4();
+        
+        //Carga de OBJ
         caja = new JWavefrontObject(new File("./warehouse/caja.obj"));
         pared = new JWavefrontObject(new File("./warehouse/pared.obj"));
         base = new JWavefrontObject(new File("./warehouse/base.obj"));
         estante = new JWavefrontObject(new File("./warehouse/estante.obj"));
+        
         robot= new Robot[nRobot];
         light = new Light();
         material=new Material();
+        
+        QUAD_VERTICES=new float[12];
         alpha = 0;
         beta = 0;
-        omega=0;
-        QUAD_VERTICES=new float[12];
         vista=new Punto(14,12,48);
         dir = new Punto(14,2,33);
         posFin=new Punto(15,0,30);     
@@ -355,37 +364,19 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     }
     public void drawCuadro (int x, int z, boolean qr)
     {
- 
-        //glColor3f(0.5, 0.5, 0.5);
-
         QUAD_VERTICES=new float[]{x  + dist, 0, z  + dist,
                                   x  + dist, 0, z  - dist,
                                   x  - dist, 0, z  - dist,
                                   x  - dist, 0, z  + dist};
-        material.setDiffuseColor(new float[]{1.0f, 0.0f, 0.0f, 1.0f});
+        material.setDiffuseColor(new float[]{0.5f, 0.5f, 0.5f, 1.0f});
         material.bind();
-        //square.setVertex(QUAD_VERTICES);
         modelMatrix.push();
         modelMatrix.loadIdentity();
         modelMatrix.scale(2, 0, 2);
         modelMatrix.bind();
         square.bind();
         square.draw(GL3.GL_TRIANGLE_FAN);
-        modelMatrix.pop();/*
-        if (qr)
-        {
-            //glColor3f(0, 0, 0);
-            float s = 0.4f;
-            QUAD_VERTICES=new float[]{x  + s, 0.1f, z + s,
-                                      x  + s, 0.1f, z - s,
-                                      x  - s, 0.1f, z - s,
-                                      x  - s, 0.1f, z + s};        
-            //material.setDiffuseColor(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
-            //material.bind();
-            square.setVertex(QUAD_VERTICES);
-            square.bind();
-            square.draw();
-        }*/
+        modelMatrix.pop();
     }
     public void drawPared (int x, int y, int z)
     {
@@ -405,15 +396,16 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                     if (local[k][i].charAt(j) == '0' || local[k][i].charAt(j) == '2') {
                         drawCaja(j, k, i);
                         if (i < 30)
-                        drawEstante(j, k, i);;
+                        drawEstante(j, k, i);
                     }
                     else if (local[k][i].charAt(j)== ' ' || local[k][i].charAt(j) == '1')
                         drawEstante(j, k, i);
                     else if (local[k][i].charAt(j) == '=')
                             {
-                                    drawPared(j, k, i);;
+                                    drawPared(j, k, i);
                             }
-        //glBegin(GL_QUADS);
+        /*
+        //Cuadro
         for (i = 0 ; i < LARGO ; i++)
         { 
             for (j = 0 ; j < ANCHO ; j++)
@@ -424,8 +416,8 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                        drawCuadro(j, i, false);
   
             }       
-        }
-        //glEnd();
+        }*/
+
    }
 
   @Override
@@ -435,40 +427,22 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
-    // vista general
-    
-    //Proyeccion Ortonormal
-    /*projectionMatrix.loadIdentity();
-    projectionMatrix.ortho(
-            -delta, delta, 
-            -delta, delta, 
-            -2 * delta, 2 * delta);
-    projectionMatrix.bind();*/
-
     //Proyeccion Perspectiva
     projectionMatrix.loadIdentity();
     projectionMatrix.perspective(60.0f+delta,width/height, 2, 600);
     projectionMatrix.bind();
-    
+   
     viewMatrix.loadIdentity();
     mirarA(vista,dir);
     viewMatrix.rotate(beta, 0.0f, 1.0f, 0.0f);
     viewMatrix.rotate(alpha, 1.0f, 0.0f, 0.0f);
     viewMatrix.bind();
-   
- 
     
     //Dibujo de escena Almacen
     modelMatrix.loadIdentity();
     cargarLocal();
     //for (int i = 0 ; i < nRobot ; i++)
     robot[0].actuar(posFin);
-    /*
-    modelMatrix.rotate(beta, 0, 1.0f, 0);
-    modelMatrix.rotate(alpha, 1.0f, 0, 0);
-    modelMatrix.bind();
-    caja.draw();*/
-    
     // Força execução das operações declaradas
     gl.glFlush();
   }
@@ -550,13 +524,11 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                     delta=60.0f;
                     break;
                 default:
-                       System.out.println("naniiiiii!!!!");
                        break;
               }
             }
 	    @Override
 	    public void keyReleased(KeyEvent e) {
-		System.out.println("Alfa: "+alpha+" Beta: "+beta+" Omega: "+omega);
 	    }            
      };
      return listener;

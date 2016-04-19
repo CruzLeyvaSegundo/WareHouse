@@ -38,36 +38,25 @@ public class Robot {
     
     
     private int accion;
-    private Motor motor;
-    private Horquilla horq ;
-    private float avance  = 0.1f;
-    private boolean libre;
+    private final Motor motor;
+    private final Horquilla horq ;
+    private final float avance  = 0.1f;
+    private final boolean libre;
     private Vector<Punto> movida;
     private Punto posicion;
-    private Punto posHorquilla;
-    private Punto destino;
-    private final float angulo = 3.0f;
+    private final Punto posHorquilla;
+    private final Punto destino;
     private float miRotacion;
-    private final float rote = 0.0f;
-    private float desplazo;
-    private float alto;
-    private int horario;
-    private Punto direccion;
-    private Punto anterior;
-    private boolean enEspera;
-    private boolean enEstante;
-    private boolean deboGirar;
-    private boolean seLevanta;
-    private boolean seBaja;
+    private final float desplazo;
+    private final Punto direccion;
+    private final Punto anterior;
+    private final boolean enEspera;
     private boolean tengoCaja;
     private boolean dejoCaja;
     private boolean enDestino;
-    private boolean enRetroceso;
-    private boolean deboAvanzar;
-    private boolean retornando;
-    private int miColocarX;
-    private Punto vista;
-    private int tiempo;
+    private final boolean enRetroceso;
+    private final boolean retornando;
+    private final Punto vista;
 
     public Robot(int n,float x , float z) {
         posicion=new Punto();
@@ -79,15 +68,12 @@ public class Robot {
         motor=new Motor();
         horq=new Horquilla();
         retornando = true;
-        deboGirar = false;
-        tengoCaja=false;
         enEspera = true;
         enRetroceso=false;
         posicion.inicio(x,0.0f,z);
         marcar(posicion, true);
         libre=posicion.esIgual(14.0f,0.0f,30.0f);
         posHorquilla.inicio(posicion.x,posicion.y,posicion.z);
-        //vista = {posicion.x - 2, posicion.y + 2, posicion.z + 3};
         vista.inicio(13.0f, 1.25f, 35.0f);
         desplazo = 0;
         miRotacion = 0.0f;
@@ -140,7 +126,7 @@ public class Robot {
         horquilla.init(gl, shader);
         horquilla.unitize();
         horquilla.dump();    
-        System.out.println("texturas robot cargadas");
+        System.out.println(" robot cargado");
     } 
     final void marcar (Punto p, boolean s)
     {
@@ -173,9 +159,6 @@ public class Robot {
         modelMatrix.push();    
         modelMatrix.translate(posicion.x,posicion.y,posicion.z);
         modelMatrix.scale(0.6f, 0.6f, 0.6f);
-        /*if (enRetroceso)
-             motor.avanzar(-miRotacion, enRetroceso);
-       else*/
         motor.avanzar(miRotacion, enRetroceso);
         modelMatrix.pop();
         
@@ -189,26 +172,9 @@ public class Robot {
         if(posicion.esIgual(ir.x,ir.y,ir.z)||posicion.z<ir.z)
         {
              posicion = ir;
-           /* if (enRetroceso)
-            {
-                direccion = mult(-1, direccion);
-                enRetroceso = false;
-                alto = 0;
-                seBaja = true;
-            }*/
-            //posicion = ir;
         }
         else
-            sumar(posicion, avance, direccion);
-        /*
-        if (posicion.z != 26)
-            vista.inicio(posicion.x + 1.5f * miColocarX, posicion.y + 1.25f, posicion.z + 3);
-        else
-            if (posicion.z < 28)
-                vista.inicio(posicion.x + 3 * miColocarX, posicion.y + 1.25f, posicion.z);
-            else
-                vista.inicio(12,1.25f,33);*/
-        
+            sumar(posicion, avance, direccion);     
     }
     static void dispose(){
         rueda.dispose();
@@ -228,12 +194,7 @@ public class Robot {
             angulo = (float) (((avance / radio)*180)/PI + 1.5);
         }
 
-
-        void detener(float ang)
-        {
-            girar(ang);
-        }
-
+/**
         void girar(float giro)
         {
             modelMatrix.push();
@@ -276,7 +237,7 @@ public class Robot {
             rueda.draw();
             modelMatrix.pop();
         }
-
+*/
         void avanzar(float alfa, boolean atras)
         {
             modelMatrix.push();
@@ -341,27 +302,16 @@ public class Robot {
     }
     public class Horquilla
     {
-        void detener(float ang, boolean conCaja)
-        {
-            girar(ang, conCaja);
-        }
-
-        void levantar(float ang, boolean conCaja)
-        {
-            avanzar(ang, conCaja);
-        }
-
+        /*
         void girar(float giro, boolean conCaja)
         {
             modelMatrix.push();
             modelMatrix.rotate(giro, 0, 1, 0);
             modelMatrix.bind();
             horquilla.draw();
-            /*if (conCaja)
-                drawCaja(0, -0.8, -1);*/
             modelMatrix.pop();
         }
-
+        */
         void avanzar(float alfa, boolean conCaja)
         {
             modelMatrix.push();
@@ -369,8 +319,6 @@ public class Robot {
             modelMatrix.translate(0,1.0f, -0.7f);
             modelMatrix.bind();
             horquilla.draw();
-            /*if (conCaja)
-                drawCaja(0, 0, -1);*/
             modelMatrix.pop();
         }
     }
