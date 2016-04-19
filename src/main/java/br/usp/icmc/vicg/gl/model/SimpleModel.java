@@ -71,4 +71,7 @@ public abstract class SimpleModel {
       gl.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
     }
   }
+  public void setVertex(float[] v){
+      vertex_buffer=v;     
+  }
 }

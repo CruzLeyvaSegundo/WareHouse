@@ -26,6 +26,14 @@ public class Square extends SimpleModel {
       0.0f, 0.0f, 1.0f,
       0.0f, 0.0f, 1.0f};
   }
+  public Square(float[] vertex) {
+    vertex_buffer = vertex;
+    normal_buffer = new float[]{
+      0.0f, 0.0f, 1.0f,
+      0.0f, 0.0f, 1.0f,
+      0.0f, 0.0f, 1.0f,
+      0.0f, 0.0f, 1.0f};
+  }
 
   @Override
   public void draw() {

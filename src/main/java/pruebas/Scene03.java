@@ -9,6 +9,8 @@ import br.usp.icmc.vicg.gl.core.Light;
 import br.usp.icmc.vicg.gl.core.Material;
 import br.usp.icmc.vicg.gl.jwavefront.JWavefrontObject;
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
+import br.usp.icmc.vicg.gl.model.SimpleModel;
+import br.usp.icmc.vicg.gl.model.Square;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL3;
 import javax.media.opengl.GLAutoDrawable;
@@ -33,6 +35,12 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   private final Matrix4 modelMatrix;
   private final Matrix4 projectionMatrix;
   private final Matrix4 viewMatrix;
+  
+  private final SimpleModel square;
+  private static float[] QUAD_VERTICES;
+  int dist = 5;
+  private final Material material;
+  
   private final JWavefrontObject caja;
   private final JWavefrontObject pared;
   private final JWavefrontObject base;
@@ -41,18 +49,18 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   private float alpha;
   private float beta;
   private float delta;
-  private float omega;
+  private final float omega;
   private int height;
   private int width;
   private Punto vista;
   private Punto dir;
-  private Punto posFin;
-  private int LARGO = 47;
-  private int ANCHO = 29;
-  private int ALTURA = 3;
-  private int nRobot=1;
-  private Robot[] robot;
-  private String[][] local;
+  private final Punto posFin;
+  private final int LARGO = 47;
+  private final int ANCHO = 29;
+  private final int ALTURA = 3;
+  private final int nRobot=1;
+  private final Robot[] robot;
+  private final String[][] local;
    public Scene03() 
    {
         // Carrega os shaders
@@ -66,12 +74,15 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
         estante = new JWavefrontObject(new File("./warehouse/estante.obj"));
         robot= new Robot[nRobot];
         light = new Light();
+        material=new Material();
         alpha = 0;
         beta = 0;
         omega=0;
+        QUAD_VERTICES=new float[12];
         vista=new Punto(14,12,48);
         dir = new Punto(14,2,33);
-        posFin=new Punto(15,0,30);
+        posFin=new Punto(15,0,30);     
+        square=new Square(QUAD_VERTICES);
         this.local = new String[][]{
                             {
                                 "=============================",
@@ -238,7 +249,6 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
 
     //inicializa os shaders
     shader.init(gl);
-
     //ativa os shaders
     shader.bind();
 
@@ -278,13 +288,20 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     light.setAmbientColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f });
     light.setDiffuseColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f });
     light.setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f });
-    light.init(gl, shader);
-     // Fuente de luz
+    light.init(gl, shader);  
     light.bind();
     
+    //Material
+    material.setAmbientColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
+    material.setDiffuseColor(new float[]{1.0f, 0.0f, 0.0f, 1.0f});
+    material.setSpecularColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f});
+    material.setSpecularExponent(64.0f);
+    material.init(gl, shader);
+    material.bind();  
+    
+    square.init(gl, shader);
     crearRobots();
   }
-
  private void crearRobots()
  {
      robot[0]=new Robot(0,15.0f,30.0f);
@@ -338,7 +355,37 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     }
     public void drawCuadro (int x, int z, boolean qr)
     {
+ 
+        //glColor3f(0.5, 0.5, 0.5);
 
+        QUAD_VERTICES=new float[]{x  + dist, 0, z  + dist,
+                                  x  + dist, 0, z  - dist,
+                                  x  - dist, 0, z  - dist,
+                                  x  - dist, 0, z  + dist};
+        material.setDiffuseColor(new float[]{1.0f, 0.0f, 0.0f, 1.0f});
+        material.bind();
+        //square.setVertex(QUAD_VERTICES);
+        modelMatrix.push();
+        modelMatrix.loadIdentity();
+        modelMatrix.scale(2, 0, 2);
+        modelMatrix.bind();
+        square.bind();
+        square.draw(GL3.GL_TRIANGLE_FAN);
+        modelMatrix.pop();/*
+        if (qr)
+        {
+            //glColor3f(0, 0, 0);
+            float s = 0.4f;
+            QUAD_VERTICES=new float[]{x  + s, 0.1f, z + s,
+                                      x  + s, 0.1f, z - s,
+                                      x  - s, 0.1f, z - s,
+                                      x  - s, 0.1f, z + s};        
+            //material.setDiffuseColor(new float[]{0.0f, 0.0f, 0.0f, 1.0f});
+            //material.bind();
+            square.setVertex(QUAD_VERTICES);
+            square.bind();
+            square.draw();
+        }*/
     }
     public void drawPared (int x, int y, int z)
     {
@@ -366,6 +413,19 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                             {
                                     drawPared(j, k, i);;
                             }
+        //glBegin(GL_QUADS);
+        for (i = 0 ; i < LARGO ; i++)
+        { 
+            for (j = 0 ; j < ANCHO ; j++)
+            {
+                  if (local[0][i].charAt(j) == '.')
+                       drawCuadro(j, i, true);
+                  else
+                       drawCuadro(j, i, false);
+  
+            }       
+        }
+        //glEnd();
    }
 
   @Override
@@ -394,7 +454,6 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     mirarA(vista,dir);
     viewMatrix.rotate(beta, 0.0f, 1.0f, 0.0f);
     viewMatrix.rotate(alpha, 1.0f, 0.0f, 0.0f);
-    //mirarA(new Punto(14+alpha,12+beta,48+omega),new Punto(14+alpha,2+beta,33+omega));
     viewMatrix.bind();
    
  
@@ -424,6 +483,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     pared.dispose();
     base.dispose();
     estante.dispose();
+    square.dispose();
     Robot.dispose();
   }
   public KeyListener escucha() {

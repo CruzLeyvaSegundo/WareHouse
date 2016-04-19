@@ -1,6 +1,7 @@
 package br.usp.icmc.vicg.gl.app;
 
 import br.usp.icmc.vicg.gl.core.Light;
+import br.usp.icmc.vicg.gl.core.Material;
 import br.usp.icmc.vicg.gl.jwavefront.JWavefrontObject;
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
 import java.awt.Frame;
@@ -37,6 +38,7 @@ public class Example12 extends KeyAdapter implements GLEventListener {
   private final Matrix4 modelMatrix;
   private final Matrix4 projectionMatrix;
   private final Matrix4 viewMatrix;
+  private Material material;
   private final JWavefrontObject model;
   private final Light light;
   private float alpha;
@@ -52,7 +54,7 @@ public class Example12 extends KeyAdapter implements GLEventListener {
 
     model = new JWavefrontObject(new File("./warehouse/caja.obj"));
     light = new Light();
-
+    material=new Material();
     alpha = 0;
     beta = 0;
     delta = 5;
@@ -98,6 +100,7 @@ public class Example12 extends KeyAdapter implements GLEventListener {
     light.setDiffuseColor(new float[]{0.75f, 0.75f, 0.75f, 1.0f});
     light.setSpecularColor(new float[]{0.7f, 0.7f, 0.7f, 1.0f});
     light.init(gl, shader);
+    material.init(gl, shader);
   }
 
   @Override
@@ -114,11 +117,15 @@ public class Example12 extends KeyAdapter implements GLEventListener {
             -delta, delta, 
             -2 * delta, 2 * delta);
     projectionMatrix.bind();
-
+    material.setDiffuseColor(new float[]{0.0f, 0.0f, 1.0f, 0.25f});
+    material.setSpecularColor(new float[]{0.9f, 0.9f, 0.9f, 0.25f});
+    material.setSpecularExponent(32);
+    material.bind();
     modelMatrix.loadIdentity();
     modelMatrix.rotate(beta, 0, 1.0f, 0);
     modelMatrix.rotate(alpha, 1.0f, 0, 0);
     modelMatrix.bind();
+    model.draw();
 
     viewMatrix.loadIdentity();
     viewMatrix.lookAt(
@@ -129,7 +136,7 @@ public class Example12 extends KeyAdapter implements GLEventListener {
 
     light.bind();
 
-    model.draw();
+
 
     // Força execução das operações declaradas
     gl.glFlush();
