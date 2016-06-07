@@ -6,6 +6,8 @@
 
 package pruebas;
 
+import static java.lang.Math.abs;
+
 /**
  *
  * @author JUNIOR
@@ -32,6 +34,6 @@ public class Punto {
     }
     boolean esIgual(float p,float q,float r)
     {
-        return (x==p&&y==q&&z==r);
+        return abs(p-x)<=0.0001f&&abs(q-y)<=0.0001f&&abs(r-z)<=0.0001f;
     }     
 }
