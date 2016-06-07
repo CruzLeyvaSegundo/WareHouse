@@ -218,7 +218,7 @@ public class Robot {
             {
                 Robot bot=colaRobots.get(i);    
                 Punto posActualBot = bot.getPosicionActual();
-                //Punto posInicialBot = bot.getPosicionInicial();
+                Punto posInicialBot = bot.getPosicionInicial();
                 int factor;
                 if(!isColaRobotOrdenada())
                 {
@@ -227,21 +227,21 @@ public class Robot {
                         if (posActualBot.z != 44)
                         {
                             factor=2;
-                            if(posActualBot.z == 44)
+                            if(posInicialBot.z+factor == 44)
                             {
                                 bot.setMiDireccion(-90.0f);
-                                bot.setDireccion(new Punto(0.0f, 0.0f, 1.0f));
+                                bot.setDireccion(bot.getDerecha());
                             }
                             else
                             {
                                 bot.setMiDireccion(-180.0f);
-                                bot.setDireccion(new Punto(0.0f, 0.0f, 1.0f));
+                                bot.setDireccion(bot.getAbajo());
                             }
                         }
-                        else //if(posActualBot.z>42)
+                        else 
                         {
                             factor=2;
-                            bot.setDireccion(new Punto(1.0f, 0.0f, 0.0f));
+                            bot.setDireccion(bot.getArriba());
                             bot.setMiDireccion(0.0f);
                             bot.setMiRotacion(-90.0f);                       
                         }
@@ -249,7 +249,7 @@ public class Robot {
                     else 
                     {
                         factor=2;
-                        bot.setDireccion(new Punto(0.0f, 0.0f, -1.0f));
+                        bot.setDireccion(bot.getArriba());
                         bot.setMiDireccion(0.0f);
                         bot.setMiRotacion(-180.0f);
                     } 
@@ -294,7 +294,7 @@ public class Robot {
         {
             destinoSiguiente=new Punto(posicionActual.x, posicionActual.y,posicionActual.z);    
             movidaActual=new Movimiento(ir,direccion,false,true);
-            sumar(destinoSiguiente,movidaActual.desplazamiento,movidaActual.direccion);
+            sumar(destinoSiguiente,ir,direccion);
         }
         else
         {
@@ -310,7 +310,9 @@ public class Robot {
         if(posicionActual.esIgual(destinoSiguiente.x,destinoSiguiente.y,destinoSiguiente.z))
         {
              posicionActual = destinoSiguiente;
-             if(!movimientos.isEmpty()&&activo)
+             if(!activo)
+                 posicionInicial=posicionActual;
+             else if(!movimientos.isEmpty())
              {
                  movidaActual=movimientos.removeLast();
                  sumar(destinoSiguiente,movidaActual.desplazamiento,movidaActual.direccion);
@@ -370,6 +372,10 @@ public class Robot {
 
     public void setDireccion(Punto direccion) {
         this.direccion = direccion;
+    }
+
+    public void setMovidaActual(Movimiento movidaActual) {
+        this.movidaActual = movidaActual;
     }
     
     static void dispose(){
