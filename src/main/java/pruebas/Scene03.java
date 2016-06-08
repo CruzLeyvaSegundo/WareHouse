@@ -47,6 +47,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   private final JWavefrontObject pared;
   private final JWavefrontObject base;
   private final JWavefrontObject estante;  
+  private final SimpleModel floor;
   
   private final Light light;
   private final String[][] local;
@@ -86,6 +87,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
         pared = new JWavefrontObject(new File("./warehouse/pared.obj"));
         base = new JWavefrontObject(new File("./warehouse/base.obj"));
         estante = new JWavefrontObject(new File("./warehouse/estante.obj"));
+        floor = new Rectangle();
         
         robot= new Robot[nRobot];
         light = new Light();
@@ -314,6 +316,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     material.init(gl, shader);
     material.bind();  
     
+    floor.init(gl, shader);
     square.init(gl, shader);
     crearRobots();
   }
@@ -423,6 +426,22 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
             pared.draw();
         modelMatrix.pop();
     }
+     public void drawFloor (int x)
+    {
+        modelMatrix.push();
+         material.setDiffuseColor(new float[]{0.2f, 0.2f, 0.25f, 1.0f});
+         material.setAmbientColor(new float[]{0.2f, 0.2f, 0.25f, 1.0f});
+         material.bind();
+            modelMatrix.loadIdentity();
+            modelMatrix.translate(15, -1, x);
+            modelMatrix.rotate(-90, 1, 0, 0);
+            modelMatrix.scale(LARGO - 15, 2, ANCHO);
+            
+            modelMatrix.bind();
+            floor.bind();
+            floor.draw();
+        modelMatrix.pop();
+    }
   public void cargarLocal ()
   {
         //System.out.println(local[1][2].charAt(5));
@@ -454,7 +473,8 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   
             }       
         }*/
-
+	for ( i = 0 ; i < ANCHO+ANCHO - 15; i++)
+            drawFloor(i);
    }
 
   @Override
