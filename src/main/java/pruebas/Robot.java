@@ -46,8 +46,8 @@ public class Robot {
     private Movimiento movidaActual=null;   
     private final Motor motor;
     private final Horquilla horq ;
-    private final float avance  = 0.2f;
-    private final float avanceCola  = 0.2f;
+    private float avance  = 0.2f;
+    private float avanceCola  = 0.2f;
     private final int ordenRobot;
     private final Punto posHorquilla;
     private float miRotacion;
@@ -55,11 +55,12 @@ public class Robot {
     private final float desplazo;   
     private final boolean enEspera; 
     private final boolean enRetroceso;
-    
+       
     private Punto posicionActual;    
     private Punto posicionInicial;
     private Punto direccion;
     private Punto destinoSiguiente;
+    private Punto posObj;//Guarda la posicion en el estante donde se encontro una caja o espacio disponible
     
     // vectores unitarios arriba (-z) abajo(+z) derecha(+x) izquierda(-x)
     private final Punto arriba=new Punto(0,0,-1);
@@ -70,6 +71,7 @@ public class Robot {
     private boolean tengoCaja;
     private boolean dejoCaja;
     private boolean enDestino;
+    private int nivelEstante;
 
 
 
@@ -202,7 +204,7 @@ public class Robot {
         boolean encontrado=false;
         int lado=0;
         Punto posEstadoCaja=null;
-        int piso=1;
+        int piso=0;
         for(int i=1;i<=3;i++) 
         {
             rangoH1=4;rangoH2=5;
@@ -255,8 +257,11 @@ public class Robot {
         DescritorEstante desEstante=buscarEspacioEstante(estanteObj);
         if(desEstante.encontrado)
         {            
-            Punto ultimaDir=new Punto();
-            Punto posObj=desEstante.posicion;
+            Punto penultimaDir;
+            Punto ultimaDir=null;
+            posObj=desEstante.posicion;
+            nivelEstante=desEstante.piso;
+            float espaciosRetorno;
             System.out.println("espacio : ("+posObj.x+","+posObj.y+","+posObj.z+")");
             movimientos.addFirst(new Movimiento(4,arriba,false,false));
             if(estanteObj==1||estanteObj==5||estanteObj==9)
@@ -265,17 +270,35 @@ public class Robot {
                 if(desEstante.lado==1)
                 {
                     float espacios=26-posObj.z;
+                    espaciosRetorno=posObj.z-2;
                     movimientos.addFirst(new Movimiento(espacios,arriba,false,false));
+                    penultimaDir=arriba;
                     ultimaDir=izquierda;
+                    movimientos.addFirst(new Movimiento(0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(-0.8f,ultimaDir,false,false));    
+                    movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
+                    
+                    movimientos.addFirst(new Movimiento(5,izquierda,false,false));   
+                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(12,derecha,false,false));
+                    movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
                 else
                 {
                     float espacios=posObj.z-2;
+                    espaciosRetorno=31-posObj.z;////
                     System.out.println("nEspacios : " +espacios);
                     movimientos.addFirst(new Movimiento(24,arriba,false,false));
                     movimientos.addFirst(new Movimiento(5,izquierda,false,false));
                     movimientos.addFirst(new Movimiento(espacios,abajo,false,false));
+                    penultimaDir=abajo;
                     ultimaDir=derecha;
+                    movimientos.addFirst(new Movimiento(0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(-0.8f,ultimaDir,false,false));   
+                    movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
+                    
+                    movimientos.addFirst(new Movimiento(12,derecha,false,false)); 
+                    movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
             }
             else if(estanteObj==2||estanteObj==6||estanteObj==10)
@@ -283,17 +306,37 @@ public class Robot {
                if(desEstante.lado==1)
                 {
                     float espacios=26-posObj.z;
+                    espaciosRetorno=posObj.z-2;
                     movimientos.addFirst(new Movimiento(2,izquierda,false,false));
                     movimientos.addFirst(new Movimiento(espacios,arriba,false,false));
+                    penultimaDir=arriba;
                     ultimaDir=izquierda;
+                    movimientos.addFirst(new Movimiento(0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(-0.8f,ultimaDir,false,false));    
+                    movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
+                    
+                    movimientos.addFirst(new Movimiento(12,izquierda,false,false)); 
+                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(12,derecha,false,false));
+                    movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
                 else
                 {
                     float espacios=26-posObj.z;
+                    espaciosRetorno=posObj.z-2;
                     System.out.println("nEspacios : " +espacios);
                     movimientos.addFirst(new Movimiento(7,izquierda,false,false));
                     movimientos.addFirst(new Movimiento(espacios,arriba,false,false));
+                    penultimaDir=arriba;
                     ultimaDir=derecha;
+                    movimientos.addFirst(new Movimiento(0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(-0.8f,ultimaDir,false,false));    
+                    movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
+                    
+                    movimientos.addFirst(new Movimiento(7,izquierda,false,false)); 
+                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(12,derecha,false,false));
+                    movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
             }
             else if(estanteObj==3||estanteObj==7||estanteObj==11)
@@ -301,16 +344,36 @@ public class Robot {
                if(desEstante.lado==1)
                 {
                     float espacios=26-posObj.z;
+                    espaciosRetorno=posObj.z-2;
                     movimientos.addFirst(new Movimiento(5,derecha,false,false));
                     movimientos.addFirst(new Movimiento(espacios,arriba,false,false));
-                    ultimaDir=izquierda;
+                    penultimaDir=arriba;
+                    ultimaDir=izquierda; 
+                    movimientos.addFirst(new Movimiento(0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(-0.8f,ultimaDir,false,false));   
+                    movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
+                    
+                    movimientos.addFirst(new Movimiento(19,izquierda,false,false)); 
+                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(12,derecha,false,false));
+                    movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
                 else
                 {
                     float espacios=26-posObj.z;
+                    espaciosRetorno=posObj.z-2;
                     System.out.println("nEspacios : " +espacios);
                     movimientos.addFirst(new Movimiento(espacios,arriba,false,false));
+                    penultimaDir=arriba;
                     ultimaDir=derecha;
+                    movimientos.addFirst(new Movimiento(0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(-0.8f,ultimaDir,false,false));   
+                    movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
+                    
+                    movimientos.addFirst(new Movimiento(14,izquierda,false,false)); 
+                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(12,derecha,false,false));
+                    movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
             }
             else if(estanteObj==4||estanteObj==8||estanteObj==12)
@@ -318,23 +381,47 @@ public class Robot {
                if(desEstante.lado==1)
                 {
                     float espacios=26-posObj.z;
+                    espaciosRetorno=posObj.z-2;
                     movimientos.addFirst(new Movimiento(12,derecha,false,false));
                     movimientos.addFirst(new Movimiento(espacios,arriba,false,false));
+                    penultimaDir=arriba;
                     ultimaDir=izquierda;
+                    movimientos.addFirst(new Movimiento(0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(-0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
+                    
+                    movimientos.addFirst(new Movimiento(26,izquierda,false,false)); 
+                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(12,derecha,false,false));
+                    movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
                 else
                 {
                     float espacios=26-posObj.z;
+                    espaciosRetorno=posObj.z-2;
                     System.out.println("nEspacios : " +espacios);
                     movimientos.addFirst(new Movimiento(7,derecha,false,false));
                     movimientos.addFirst(new Movimiento(espacios,arriba,false,false));
+                    penultimaDir=arriba;
                     ultimaDir=derecha;
+                    movimientos.addFirst(new Movimiento(0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(-0.8f,ultimaDir,false,false));
+                    movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
+                    
+                    movimientos.addFirst(new Movimiento(21,izquierda,false,false)); 
+                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(12,derecha,false,false));
+                    movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
-            }
-            movimientos.addFirst(new Movimiento(0,ultimaDir,false,true));
+            }       
+
+            
         }
         else
+        {
             System.out.println("El estante solicitado esta lleno");
+            nivelEstante=0;
+        }
     }
     static boolean isColaRobotOrdenada()//Verifica si la cola de robots esta ordenada
     {
@@ -374,6 +461,10 @@ public class Robot {
                     botActivado.calcularRuta(estante);
                 if(!botActivado.getMovimientos().isEmpty())
                 {
+                    if(estado==0)//0
+                        botActivado.tengoCaja=true;
+                    else if(estado==1)//1
+                        botActivado.tengoCaja=false; 
                     robotsActivos.addFirst(new OperacionRobot(botActivado,estado,estante));
                     System.out.println("nMovimientos : "+botActivado.getMovimientos().size());
                 }
@@ -415,6 +506,14 @@ public class Robot {
                     bot.setMiDireccion(90);    
                     bot.setMiRotacion(-90);
                 }
+                if(abs(movActual.desplazamiento-0.8f)<=0.001||abs(movActual.desplazamiento+0.8f)<=0.001)
+                    bot.setAvance(0.005f);
+                else
+                {
+                    bot.setAvance(0.2f);
+                    //bot.nivelEstante=1;
+                }
+                //if(bot.getMovimientos().size()==3)
                 bot.actuar(movActual.desplazamiento,movActual.direccion,estadoRobot,movActual.fin);   
                 aux=aux+X;
             }
@@ -481,11 +580,12 @@ public class Robot {
     }   
     public void actuar(float pasos,Punto dir,int operacion,boolean isFinal)   
     {
-        float pos=0;      
-        if(operacion==DEJAR_CAJA)
-            tengoCaja=true;
-        else if(operacion==TRAER_CAJA)
-            tengoCaja=false; 
+        float pos=0;  
+        if(abs(pasos-0.8f)<=0.001||abs(pasos+0.8f)<=0.001)
+            if(nivelEstante==1)
+                pos=0;
+            else if(nivelEstante==2)
+                pos=0.8f;
         modelMatrix.push();    
         modelMatrix.translate(posicionActual.x,posicionActual.y,posicionActual.z);
         modelMatrix.scale(0.6f, 0.6f, 0.6f);
@@ -505,9 +605,28 @@ public class Robot {
              posicionInicial.inicio(ir.x, ir.y, ir.z);
              if(!isFinal)
              {
+                if(abs(movimientos.getLast().desplazamiento)-0.8f<=0.001)
+                {
+                    tengoCaja=false;
+                    char[] fila=local[nivelEstante][(int)posObj.z].toCharArray();
+                    fila[(int)posObj.x]='0';
+                    local[nivelEstante][(int)posObj.z]=new String(fila);  
+                }
+                if(abs(movimientos.getLast().desplazamiento)+0.8f<=0.001)
+                {
+                    nivelEstante=1;
+                }
                 movimientos.removeLast();
+                /*if(abs(movimientos.getLast().desplazamiento)+0.8f<=0.001)
+                {
+                    char[] fila=local[nivelEstante][(int)posObj.z].toCharArray();
+                    fila[(int)posObj.x]='0';
+                    local[nivelEstante][(int)posObj.z]=new String(fila);        
+                }  */           
                  System.out.println("siguiente paso: " + movimientos.getLast().desplazamiento);
              }
+             /*else
+                 nivelEstante=1;*/
              System.out.println("Pos final actual Robot["+ordenRobot+"] :("+
                             posicionInicial.x+","+posicionInicial.y+","+posicionInicial.z+") con direccion: "+"("+
                             dir.x+","+dir.y+","+dir.z+") "); 
@@ -515,6 +634,8 @@ public class Robot {
         }
         else
         {
+            if(pasos<0)
+                avance=-avance;           
             posicionActual.sumar(avance, dir);  
              System.out.println("Pos actual Robot["+ordenRobot+"] :("+
                             posicionActual.x+","+posicionActual.y+","+posicionActual.z+") con direccion: "+"("+
@@ -615,6 +736,14 @@ public class Robot {
 
     public void setMovidaActual(Movimiento movidaActual) {
         this.movidaActual = movidaActual;
+    }
+
+    public void setAvance(float avance) {
+        this.avance = avance;
+    }
+
+    public void setAvanceCola(float avanceCola) {
+        this.avanceCola = avanceCola;
     }
     
     static void dispose(){
@@ -763,7 +892,7 @@ public class Robot {
             horquilla.draw();
             if(conCaja)
             {
-                modelMatrix.translate(0,0.1f, 0);
+                modelMatrix.translate(0,0.1f,-0.23f);
                 modelMatrix.bind();
                 caja.draw();
             }
