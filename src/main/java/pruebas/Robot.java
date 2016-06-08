@@ -14,7 +14,6 @@ import java.io.IOException;
 import static java.lang.Math.PI;
 import static java.lang.Math.abs;
 import java.util.LinkedList;
-import java.util.Vector;
 import javax.media.opengl.GL3;
 
 /**
@@ -34,7 +33,6 @@ public class Robot {
     private static GL3 gl;
     private static LinkedList<Robot> colaRobots;
     private static LinkedList<OperacionRobot> robotsActivos;
-    private static int X=2;
 
     //ESTADOS 
     private final int DEJAR_CAJA=0;
@@ -42,8 +40,7 @@ public class Robot {
     private final int RETORNAR=2;
     private final int  A_LA_COLA=3;
     
-    private final LinkedList<Movimiento> movimientos;
-    private Movimiento movidaActual=null;   
+    private final LinkedList<Movimiento> movimientos;  
     private final Motor motor;
     private final Horquilla horq ;
     private float avance  = 0.2f;
@@ -52,14 +49,11 @@ public class Robot {
     private final Punto posHorquilla;
     private float miRotacion;
     private float miDireccion;
-    private final float desplazo;   
-    private final boolean enEspera; 
     private final boolean enRetroceso;
        
     private Punto posicionActual;    
     private Punto posicionInicial;
     private Punto direccion;
-    private Punto destinoSiguiente;
     private Punto posObj;//Guarda la posicion en el estante donde se encontro una caja o espacio disponible
     
     // vectores unitarios arriba (-z) abajo(+z) derecha(+x) izquierda(-x)
@@ -69,8 +63,6 @@ public class Robot {
     private final Punto izquierda=new Punto(-1,0,0);
     
     private boolean tengoCaja;
-    private boolean dejoCaja;
-    private boolean enDestino;
     private int nivelEstante;
 
 
@@ -84,24 +76,8 @@ public class Robot {
         movimientos=new LinkedList<>();
         motor=new Motor();
         horq=new Horquilla();
-        enEspera = true;
         enRetroceso=false;
         marcar(posicionActual, true);    
-        /*
-        movimientos.addFirst(new Movimiento(6,arriba,false,false));
-        movimientos.addFirst(new Movimiento(0.8f,derecha,false,false));
-        movimientos.addFirst(new Movimiento(0,arriba,false,true));
-        */
-       /* 
-        movimientos.addFirst(new Movimiento(4,arriba,false,false));
-        movimientos.addFirst(new Movimiento(12,derecha,false,false));
-        movimientos.addFirst(new Movimiento(24,arriba,false,false));
-        movimientos.addFirst(new Movimiento(26,izquierda,false,false));
-        movimientos.addFirst(new Movimiento(28,abajo,false,false));
-        movimientos.addFirst(new Movimiento(12,derecha,false,false));
-        movimientos.addFirst(new Movimiento(0,arriba,false,true));*/
-        
-        desplazo = 0;
         miRotacion = 0.0f;
         miDireccion=0.0f;
         colaRobots.addFirst((Robot)this);
@@ -478,7 +454,6 @@ public class Robot {
         }
         if(!robotsActivos.isEmpty())//Dibuja los robots activos
         {
-            int aux=X;
             for (int i=robotsActivos.size()-1;i>=0;i--) 
             {
                 OperacionRobot opRobot=robotsActivos.get(i);
@@ -508,14 +483,61 @@ public class Robot {
                 }
                 if(abs(movActual.desplazamiento-0.8f)<=0.001||abs(movActual.desplazamiento+0.8f)<=0.001)
                     bot.setAvance(0.005f);
-                else
+                else if(movActual.desplazamiento==0)
                 {
-                    bot.setAvance(0.2f);
-                    //bot.nivelEstante=1;
+                    if(movActual.fin)
+                    {
+                        if(isColaRobotOrdenada())
+                        {
+                            Robot ultimoCola = colaRobots.getLast();
+                            float despV=ultimoCola.getPosicionActual().z-bot.getPosicionActual().z;
+                            float despH=ultimoCola.getPosicionActual().x-bot.getPosicionActual().x;
+                            bot.getMovimientos().removeLast();
+                            bot.getMovimientos().addFirst( new Movimiento(despV,bot.getAbajo(),false,false));
+                            if(despH>=0)
+                                bot.getMovimientos().addFirst( new Movimiento(despH,bot.getDerecha(),false,false));
+                            bot.getMovimientos().addFirst(new Movimiento(0,bot.getAbajo(),false,false));
+                        }
+                    }
+                    else   
+                    {
+                        if(isColaRobotOrdenada())
+                        {
+                            Robot ultimoCola = colaRobots.getLast();
+                            float despV=ultimoCola.getPosicionActual().z;
+                            float despH=ultimoCola.getPosicionActual().x;
+                            Punto nuevaPos=new Punto();
+                            nuevaPos.y=0;
+                            if(abs(despH-14)<=0.001)
+                            {
+                                nuevaPos.x=despH;
+                                nuevaPos.z=despV-2;
+                            }
+                            else if(abs(despH-16)<=0.001)
+                            {
+                                if(abs(despV-44)<=0.001)
+                                {
+                                    nuevaPos.x=despH-2;
+                                    nuevaPos.z=despV;
+                                }
+                                else
+                                {
+                                    nuevaPos.x=despH;
+                                    nuevaPos.z=despV+2;
+                                }
+                            }
+                            bot.setPosicionInicial(nuevaPos);
+                            bot.setPosicionActual(nuevaPos);
+                            bot.movimientos.removeLast();
+                            colaRobots.addFirst(bot);
+                            robotsActivos.remove(i);
+                        }   
+                    }
                 }
-                //if(bot.getMovimientos().size()==3)
-                bot.actuar(movActual.desplazamiento,movActual.direccion,estadoRobot,movActual.fin);   
-                aux=aux+X;
+                else
+                    bot.setAvance(0.2f);
+                if(!(movActual.desplazamiento==0&&movActual.fin==false))
+                    bot.actuar(movActual.desplazamiento,movActual.direccion,estadoRobot,movActual.fin);   
             }
         }
         if(!colaRobots.isEmpty())  //Dibuja los robots inactivas e ordena la cola de Robots
@@ -616,17 +638,9 @@ public class Robot {
                 {
                     nivelEstante=1;
                 }
-                movimientos.removeLast();
-                /*if(abs(movimientos.getLast().desplazamiento)+0.8f<=0.001)
-                {
-                    char[] fila=local[nivelEstante][(int)posObj.z].toCharArray();
-                    fila[(int)posObj.x]='0';
-                    local[nivelEstante][(int)posObj.z]=new String(fila);        
-                }  */           
+                movimientos.removeLast();       
                  System.out.println("siguiente paso: " + movimientos.getLast().desplazamiento);
              }
-             /*else
-                 nivelEstante=1;*/
              System.out.println("Pos final actual Robot["+ordenRobot+"] :("+
                             posicionInicial.x+","+posicionInicial.y+","+posicionInicial.z+") con direccion: "+"("+
                             dir.x+","+dir.y+","+dir.z+") "); 
@@ -722,6 +736,14 @@ public class Robot {
         this.posicionInicial = posicionInicial;
     }
 
+    public void setPosicionActual(Punto posicionActual) {
+        this.posicionActual = posicionActual;
+    }
+
+    public void setPosObj(Punto posObj) {
+        this.posObj = posObj;
+    }
+
     public void setMiRotacion(float miRotacion) {
         this.miRotacion = miRotacion;
     }
@@ -734,9 +756,7 @@ public class Robot {
         this.direccion = direccion;
     }
 
-    public void setMovidaActual(Movimiento movidaActual) {
-        this.movidaActual = movidaActual;
-    }
+
 
     public void setAvance(float avance) {
         this.avance = avance;

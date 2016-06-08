@@ -9,6 +9,7 @@ import br.usp.icmc.vicg.gl.core.Light;
 import br.usp.icmc.vicg.gl.core.Material;
 import br.usp.icmc.vicg.gl.jwavefront.JWavefrontObject;
 import br.usp.icmc.vicg.gl.matrix.Matrix4;
+import br.usp.icmc.vicg.gl.model.Rectangle;
 import br.usp.icmc.vicg.gl.model.SimpleModel;
 import br.usp.icmc.vicg.gl.model.Square;
 import javax.media.opengl.GL;
