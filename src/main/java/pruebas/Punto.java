@@ -34,6 +34,12 @@ public class Punto {
     }
     boolean esIgual(float p,float q,float r)
     {
-        return abs(p-x)<=0.0001f&&abs(q-y)<=0.0001f&&abs(r-z)<=0.0001f;
-    }     
+        return abs(p-x)<=0.01f&&abs(q-y)<=0.01f&&abs(r-z)<=0.01f;
+    }  
+    public void sumar(float t, Punto q)
+    {
+        x += (t * q.x);
+        y += (t * q.y);
+        z += (t * q.z);
+    }
 }

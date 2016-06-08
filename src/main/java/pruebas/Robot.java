@@ -83,8 +83,8 @@ public class Robot {
         enEspera = true;
         enRetroceso=false;
         marcar(posicionActual, true);    
-        movimientos.addFirst(new Movimiento(10,arriba,false,false));
-        movimientos.addFirst(new Movimiento(1,derecha,false,true));
+        movimientos.addFirst(new Movimiento(5,arriba,false,true));
+        //movimientos.addFirst(new Movimiento(1,derecha,false,true));
         /*
         movimientos.add(new Movimiento(4,arriba,false,false));
         movimientos.add(new Movimiento(5,izquierda,false,false));
@@ -98,17 +98,17 @@ public class Robot {
         {
             if (z != 44)
             {
-                direccion.inicio(0.0f, 0.0f, 1.0f);
+                direccion=arriba;
                 miDireccion=-180.0f;
             }
             else {
-                direccion.inicio(1.0f, 0.0f, 0.0f);
+                direccion=derecha;
                 miDireccion=-90.0f;
                 miRotacion = -90.0f;
             }
         }
         else {
-            direccion.inicio(0.0f, 0.0f, -1.0f);
+            direccion=(arriba);
             miRotacion = -180.0f;
         }
         System.out.println("Configurado robot: "+n+", en la posicicion ("+posicionActual.x+","+posicionActual.y+","+posicionActual.z+")");  
@@ -206,9 +206,10 @@ public class Robot {
             int aux=X;
             for (int i=robotsActivos.size()-1;i>=0;i--) 
             {
-                Robot bot=robotsActivos.get(i);     
-                bot.actuar(0,true);  
-                //bot.actuar(new Punto(16.0f,0.0f,30.0f-aux),bot.getAvance(), false, 0);   
+                Robot bot=robotsActivos.get(i);    
+                Punto ir=new Punto(16,0,30);
+                ir.sumar(6,bot.getDireccion());                   
+                bot.actuar(ir,true);   
                 aux=aux+X;
             }
         }
@@ -219,54 +220,53 @@ public class Robot {
                 Robot bot=colaRobots.get(i);    
                 Punto posActualBot = bot.getPosicionActual();
                 Punto posInicialBot = bot.getPosicionInicial();
-                int factor;
+                float factor=2;
                 if(!isColaRobotOrdenada())
                 {
-                    if (posActualBot.x == 14)
+                    System.out.println(" NOOO ESTAAA  ORDENADOOOOOOOOOOOOO");
+                    if (posInicialBot.x == 14)
                     {                        
-                        if (posActualBot.z != 44)
+                        if (posInicialBot.z != 44)
                         {
-                            factor=2;
-                            if(posInicialBot.z+factor == 44)
-                            {
+                            //posInicialBot.z=posInicialBot.z+2.0f;                          
+                            if(posInicialBot.z+2== 44)
                                 bot.setMiDireccion(-90.0f);
-                                bot.setDireccion(bot.getDerecha());
-                            }
                             else
-                            {
                                 bot.setMiDireccion(-180.0f);
-                                bot.setDireccion(bot.getAbajo());
-                            }
+                            bot.setDireccion(bot.getAbajo());
+                            posInicialBot.sumar(factor,bot.getDireccion()); 
                         }
-                        else 
+                        else //if(posActualBot.z>42)
                         {
-                            factor=2;
-                            bot.setDireccion(bot.getArriba());
+                            //posInicialBot.x=posInicialBot.x+2.0f;
                             bot.setMiDireccion(0.0f);
-                            bot.setMiRotacion(-90.0f);                       
+                            bot.setMiRotacion(-90.0f);    
+                            bot.setDireccion(bot.getDerecha());
+                            posInicialBot.sumar(factor,bot.getDireccion()); 
                         }
                     }
                     else 
                     {
-                        factor=2;
-                        bot.setDireccion(bot.getArriba());
+                        //posInicialBot.z=posInicialBot.z-2.0f;
                         bot.setMiDireccion(0.0f);
                         bot.setMiRotacion(-180.0f);
-                    } 
-                    bot.actuar(factor,false);  
-                    //bot.actuar(posInicialBot,bot.getAvanceCola(), false, 0); 
+                        bot.setDireccion(bot.getArriba());
+                        posInicialBot.sumar(factor,bot.getDireccion());                         
+                    }                                     
+                    bot.actuar(posInicialBot,false); 
                 }   
                 else
                 {
+                    System.out.println("ORDENADO???????????");
                     bot.setPosicionInicial(bot.getPosicionActual());
-                    bot.actuar(0,false); 
-                    //bot.actuar(bot.getPosicionInicial(),bot.getAvanceCola(), false, 0); 
+                    //posInicialBot.sumar(0,bot.getDireccion());                   
+                    bot.actuar(bot.getPosicionInicial(),false); 
                 } 
             }
         }
     }
-    //public void actuar(Punto ir,float velAvance,boolean estHorquilla,int girar)
-    public void actuar(int ir,boolean activo)
+    //public void actuar(Punto ir,float velAvance,boolean estHorquilla,int girar)       
+    public void actuar(Punto ir,boolean activo)  
     {
         float pos=0;
         modelMatrix.push();    
@@ -277,53 +277,21 @@ public class Robot {
         
         posHorquilla.inicio(posicionActual.x, posicionActual.y,posicionActual.z);
         modelMatrix.push();
-        modelMatrix.translate(posHorquilla.x,posHorquilla.y,posHorquilla.z);
-        /*if(estHorquilla)
-            pos=0;
-        else
-            pos=0.8f;
-        if(girar==1)
-            miDireccion=0;
-        else if(girar==2)
-            miDireccion=90.0f;
-        else if(girar==3)
-            miDireccion=-90.0f;*/
+        modelMatrix.translate(posHorquilla.x,posHorquilla.y,posHorquilla.z);      
         horq.avanzar(-360.0f+miDireccion, tengoCaja,pos);
         modelMatrix.pop();
-        if(!activo)
+
+
+        //System.out.println("Destino Robot["+ordenRobot+"] :("+ir.x+","+ir.y+","+ir.z+")");  
+        if(posicionActual.esIgual(ir.x,ir.y,ir.z))
         {
-            destinoSiguiente=new Punto(posicionActual.x, posicionActual.y,posicionActual.z);    
-            movidaActual=new Movimiento(ir,direccion,false,true);
-            sumar(destinoSiguiente,ir,direccion);
-        }
-        else
-        {
-            if(movimientos.isEmpty())
-                destinoSiguiente=new Punto(posicionActual.x, posicionActual.y,posicionActual.z);
-            else if(movidaActual==null)
-            {
-                movidaActual=movimientos.removeLast();
-                destinoSiguiente=new Punto(posicionActual.x, posicionActual.y,posicionActual.z);
-                sumar(destinoSiguiente,movidaActual.desplazamiento,movidaActual.direccion);
-            }
-        }
-        if(posicionActual.esIgual(destinoSiguiente.x,destinoSiguiente.y,destinoSiguiente.z))
-        {
-             posicionActual = destinoSiguiente;
-             if(!activo)
-                 posicionInicial=posicionActual;
-             else if(!movimientos.isEmpty())
-             {
-                 movidaActual=movimientos.removeLast();
-                 sumar(destinoSiguiente,movidaActual.desplazamiento,movidaActual.direccion);
-             }
+             posicionActual = ir;          
              //System.out.println("Posicicion2 actual Robot["+ordenRobot+"] :("+posicionActual.x+","+posicionActual.y+","+posicionActual.z+")");  
         }
         else
         {
-            sumar(posicionActual, avance, movidaActual.direccion);    
-            //sumar(posicionActual, avance, direccion);    
-            System.out.println("Posicicion1 actual Robot["+ordenRobot+"] :("+posicionActual.x+","+posicionActual.y+","+posicionActual.z+")");             
+            posicionActual.sumar(avance, direccion);    
+            //System.out.println("Posicicion1 actual Robot["+ordenRobot+"] :("+posicionActual.x+","+posicionActual.y+","+posicionActual.z+")");             
         }
     }
     public Punto getPosicionActual() {
@@ -356,6 +324,10 @@ public class Robot {
 
     public Punto getIzquierda() {
         return izquierda;
+    }
+
+    public Punto getDireccion() {
+        return direccion;
     }
 
     public void setPosicionInicial(Punto posicionInicial) {
