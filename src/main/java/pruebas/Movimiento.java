@@ -11,11 +11,11 @@ package pruebas;
  * @author JUNIOR
  */
 public class Movimiento {
-    public int desplazamiento;
+    public float desplazamiento;
     public Punto direccion;
     public boolean caja;
     public boolean fin;
-    public Movimiento(int desplazamiento, Punto direccion, boolean caja, boolean fin) {
+    public Movimiento(float desplazamiento, Punto direccion, boolean caja, boolean fin) {
         this.desplazamiento = desplazamiento;
         this.direccion = direccion;
         this.caja = caja;

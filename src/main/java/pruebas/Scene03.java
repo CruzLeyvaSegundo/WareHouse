@@ -59,13 +59,16 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   private Punto dir;
   private final Punto posFin;
   
+  private final int DEJAR_CAJA=0;
+  private final int TRAER_CAJA=1;
+    
   private final int LARGO = 47;
   private final int ANCHO = 31;//29
   private final int ALTURA = 3;
   private boolean band=false;
   private boolean goRobot=false;
-  private int girar=0;
-  
+  private int estadoRobot=0;
+  private int estanteObjetivo=1;
   //Robot
   private final int nRobot=16;
   private final Robot[] robot;
@@ -127,7 +130,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                                 "=|.|||||||||||.|.|||||||||||||=",//27
                                 "=|.||========|.|.|=============",//28
                                 "=|.|||||||||||.|.|||||||||||||=",//29
-                                "=|.............|.|||||||||||||=",//30
+                                "=|.............|.|||||||||||||=",//30 ////START
                                 "=|||||||||||||.|.|||||||||||||=",//31
                                 "=|||||||||||=|.|.|=|||222222||=",//32
                                 "=|||||||||||=|.|.|=|||222222||=",//33
@@ -373,6 +376,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
         {
             modelMatrix.push();
                 modelMatrix.translate(x, y, z);
+                modelMatrix.scale(0.7f,1, 0.7f);
                 modelMatrix.bind();
                 base.draw();
             modelMatrix.pop();
@@ -476,7 +480,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     cargarLocal();
     //for (int i = 0 ; i < nRobot ; i++)
     //robot[0].actuar(posFin, band, girar);
-    Robot.controlarRobots(goRobot);
+    Robot.controlarRobots(goRobot,estadoRobot,estanteObjetivo);
     if(goRobot=true)
         goRobot=false;
     // Força execução das operações declaradas
@@ -505,55 +509,88 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
             public void keyPressed(KeyEvent e) {
               switch (e.getKeyChar()) {
                 case '-'://faz zoom-in
-                  if(delta<50)
-                    delta = delta + 4.0f;
-                  break;
+                    if(delta<50)
+                      delta = delta + 4.0f;
+                    break;
                 case '+'://faz zoom-out
-                  if(delta>-60)
-                    delta = delta - 4.0f;
-                  break;
+                    if(delta>-60)
+                      delta = delta - 4.0f;
+                    break;
                 case 'w'://
-                  vista.z-=1;
-                  dir.z-=1;
-                  break;
+                    vista.z-=1;
+                    dir.z-=1;
+                    break;
                 case 's'://
-                  vista.z+=1;
-                  dir.z+=1;
-                  break;
+                    vista.z+=1;
+                    dir.z+=1;
+                    break;
                 case 'a'://
-                  vista.x-=1;
-                  dir.x-=1;
-                  break;
+                    vista.x-=1;
+                    dir.x-=1;
+                    break;
                 case 'd'://
-                  vista.x+=1;
-                  dir.x+=1;
-                  break;
+                    vista.x+=1;
+                    dir.x+=1;
+                    break;
                 case 'n'://
-                  band=true;
-                  break;
+                    band=true;
+                    break;
                 case 'm'://
-                  band=false;
-                  break;
-                case 'f'://
-                  girar=1;
-                  break;
-                case 'g'://
-                  girar=0;
-                  break;
-                case 'h'://
-                  girar=2;
-                  break;
+                    band=false;                
+                    break;
                 case 'z'://
-                  vista.y+=1;
-                  dir.y+=1;
-                  break;
+                    vista.y+=1;
+                    dir.y+=1;
+                    break;
                 case 'x'://
-                  vista.y-=1;
-                  dir.y-=1;
-                  break;
-                case 'i':
-                  posFin.z-=5;
-                  break;
+                    vista.y-=1;
+                    dir.y-=1;
+                    break;
+                case 'c': // CAMBIAR ESTADO DE ACTIVACION DE ROBOT
+                    if(estadoRobot==DEJAR_CAJA)
+                        estadoRobot=TRAER_CAJA;
+                    else
+                        estadoRobot=DEJAR_CAJA;
+                    break;     
+           /// Estante objetico del 1 al 6 = de 'r' hasta 'o' segun la ubicacion en el teclado horizontalmente         
+                case 'r': 
+                    estanteObjetivo=1;
+                    break;
+                case 't': 
+                    estanteObjetivo=2;
+                    break; 
+                case 'y': 
+                    estanteObjetivo=3;
+                    break;
+                case 'u': 
+                    estanteObjetivo=4;
+                    break;  
+                case 'i': 
+                    estanteObjetivo=5;
+                    break;
+                case 'o': 
+                    estanteObjetivo=6;
+                    break;  
+            /// Estante objetico del 7 al 12 = de 'f' hasta 'l' segun la ubicacion en el teclado horizontalmente         
+                case 'f': 
+                    estanteObjetivo=7;
+                    break;
+                case 'g': 
+                    estanteObjetivo=8;
+                    break; 
+                case 'h': 
+                    estanteObjetivo=9;
+                    break;
+                case 'j': 
+                    estanteObjetivo=10;
+                    break;  
+                case 'k': 
+                    estanteObjetivo=11;
+                    break;
+                case 'l': 
+                    estanteObjetivo=12;
+                    break;       
+                //FIN ESTANTE OBJETIVO
                 case '1'://Go robot
                     goRobot=true;
                     break;                   
