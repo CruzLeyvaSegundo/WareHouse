@@ -132,11 +132,11 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                                 "=|.|||||||||||.|.|||||||||||||=",//29
                                 "=|.............|.|||||||||||||=",//30 ////START
                                 "=|||||||||||||.|.|||||||||||||=",//31
-                                "=|||||||||||=|.|.|=|||222222||=",//32
-                                "=|||||||||||=|.|.|=|||222222||=",//33
-                                "=|||||||||||=|.|.|=|||222222||=",//34
-                                "=|||||||||||=|.|.|=|||222222||=",//35
-                                "=|||||||||||=|.|.|=|||222222||=",//36
+                                "=|||||||||||=|.|.|=|||111111||=",//32
+                                "=|||||||||||=|.|.|=|||111111||=",//33
+                                "=|||||||||||=|.|.|=|||111111||=",//34
+                                "=|||||||||||=|.|.|=|||111111||=",//35
+                                "=|||||||||||=|.|.|=|||111111||=",//36
                                 "=|||||||||||=|.|.|=|||||||||||=",//37
                                 "=|||||||||||=|.|.|=|||||||||||=",//38
                                 "=|||||||||||=|.|.|=|||||||||||=",//39
@@ -153,11 +153,11 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                                 "=|||||||||||||||||||||||||||||=",
                                 "=|...........................|=",
                                 "=|.||||.|.||||.|.||||.|.||||.|=",
-                                "=|..  ..|..  ..|..  ..|..00..|=",
-                                "=|..  ..|..  ..|..  ..|..00..|=",
-                                "=|..  ..|..  ..|..  ..|..00..|=",
-                                "=|..  ..|..  ..|..  ..|..0 ..|=",
-                                "=|..  ..|..  ..|..  ..|..  ..|=",
+                                "=|..0 ..|..  ..|..  ..|..00..|=",
+                                "=|..0 ..|..  ..|..  ..|..00..|=",
+                                "=|..0 ..|..  ..|..  ..|..00..|=",
+                                "=|..0 ..|..  ..|..  ..|..0 ..|=",
+                                "=|..0 ..|..  ..|..  ..|..  ..|=",
                                 "=|.||||.|.||||.|.||||.|.||||.|=",
                                 "=|...........................|=",
                                 "=|.||||.|.||||.|.||||.|.||||.|=",
@@ -202,11 +202,11 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                                 "=|||||||||||||||||||||||||||||=",
                                 "=|...........................|=",
                                 "=|.||||.|.||||.|.||||.|.||||.|=",
-                                "=|..  ..|..  ..|..  ..|..00..|=",
-                                "=|..  ..|..  ..|..  ..|..00..|=",
-                                "=|..  ..|..  ..|..  ..|..00..|=",
-                                "=|..  ..|..  ..|..  ..|..0 ..|=",
-                                "=|..  ..|..  ..|..  ..|..  ..|=",
+                                "=|..0 ..|..  ..|..  ..|..00..|=",
+                                "=|..0 ..|..  ..|..  ..|..00..|=",
+                                "=|..0 ..|..  ..|..  ..|..00..|=",
+                                "=|..0 ..|..  ..|..  ..|..0 ..|=",
+                                "=|..0 ..|..  ..|..  ..|..  ..|=",
                                 "=|.||||.|.||||.|.||||.|.||||.|=",
                                 "=|...........................|=",
                                 "=|.||||.|.||||.|.||||.|.||||.|=",
@@ -430,12 +430,12 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
         for (k = 0 ; k < ALTURA ; k++)
             for (i = 0 ; i < LARGO ; i++)
                 for (j = 0 ; j < ANCHO ; j++)
-                    if (local[k][i].charAt(j) == '0' || local[k][i].charAt(j) == '2') {
+                    if (local[k][i].charAt(j) == '0' || local[k][i].charAt(j) == '1') {
                         drawCaja(j, k, i);
                         if (i < 30)
                         drawEstante(j, k, i);
                     }
-                    else if (local[k][i].charAt(j)== ' ' || local[k][i].charAt(j) == '1')
+                    else if (local[k][i].charAt(j)== ' ' || local[k][i].charAt(j) == '2')
                         drawEstante(j, k, i);
                     else if (local[k][i].charAt(j) == '=')
                             {
@@ -554,40 +554,52 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                     break;     
            /// Estante objetico del 1 al 6 = de 'r' hasta 'o' segun la ubicacion en el teclado horizontalmente         
                 case 'r': 
+                    goRobot=true;
                     estanteObjetivo=1;
                     break;
                 case 't': 
+                    goRobot=true;
                     estanteObjetivo=2;
                     break; 
                 case 'y': 
+                    goRobot=true;
                     estanteObjetivo=3;
                     break;
                 case 'u': 
+                    goRobot=true;
                     estanteObjetivo=4;
                     break;  
                 case 'i': 
+                    goRobot=true;
                     estanteObjetivo=5;
                     break;
                 case 'o': 
+                    goRobot=true;
                     estanteObjetivo=6;
                     break;  
             /// Estante objetico del 7 al 12 = de 'f' hasta 'l' segun la ubicacion en el teclado horizontalmente         
                 case 'f': 
+                    goRobot=true;
                     estanteObjetivo=7;
                     break;
                 case 'g': 
+                    goRobot=true;
                     estanteObjetivo=8;
                     break; 
                 case 'h': 
+                    goRobot=true;
                     estanteObjetivo=9;
                     break;
                 case 'j': 
+                    goRobot=true;
                     estanteObjetivo=10;
                     break;  
                 case 'k': 
+                    goRobot=true;
                     estanteObjetivo=11;
                     break;
                 case 'l': 
+                    goRobot=true;
                     estanteObjetivo=12;
                     break;       
                 //FIN ESTANTE OBJETIVO
