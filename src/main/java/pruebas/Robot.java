@@ -255,14 +255,14 @@ public class Robot {
                     movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
                     
                     movimientos.addFirst(new Movimiento(5,izquierda,false,false));   
-                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(28,abajo,false,false));
                     movimientos.addFirst(new Movimiento(12,derecha,false,false));
                     movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
                 else
                 {
                     float espacios=posObj.z-2;
-                    espaciosRetorno=31-posObj.z;////
+                    espaciosRetorno=30-posObj.z;////
                     System.out.println("nEspacios : " +espacios);
                     movimientos.addFirst(new Movimiento(24,arriba,false,false));
                     movimientos.addFirst(new Movimiento(5,izquierda,false,false));
@@ -292,7 +292,7 @@ public class Robot {
                     movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
                     
                     movimientos.addFirst(new Movimiento(12,izquierda,false,false)); 
-                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(28,abajo,false,false));
                     movimientos.addFirst(new Movimiento(12,derecha,false,false));
                     movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
@@ -310,7 +310,7 @@ public class Robot {
                     movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
                     
                     movimientos.addFirst(new Movimiento(7,izquierda,false,false)); 
-                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(28,abajo,false,false));
                     movimientos.addFirst(new Movimiento(12,derecha,false,false));
                     movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
@@ -330,7 +330,7 @@ public class Robot {
                     movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
                     
                     movimientos.addFirst(new Movimiento(19,izquierda,false,false)); 
-                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(28,abajo,false,false));
                     movimientos.addFirst(new Movimiento(12,derecha,false,false));
                     movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
@@ -347,7 +347,7 @@ public class Robot {
                     movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
                     
                     movimientos.addFirst(new Movimiento(14,izquierda,false,false)); 
-                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(28,abajo,false,false));
                     movimientos.addFirst(new Movimiento(12,derecha,false,false));
                     movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
@@ -367,7 +367,7 @@ public class Robot {
                     movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
                     
                     movimientos.addFirst(new Movimiento(26,izquierda,false,false)); 
-                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(28,abajo,false,false));
                     movimientos.addFirst(new Movimiento(12,derecha,false,false));
                     movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
@@ -385,7 +385,7 @@ public class Robot {
                     movimientos.addFirst(new Movimiento(espaciosRetorno,penultimaDir,false,false));
                     
                     movimientos.addFirst(new Movimiento(21,izquierda,false,false)); 
-                    movimientos.addFirst(new Movimiento(29,abajo,false,false));
+                    movimientos.addFirst(new Movimiento(28,abajo,false,false));
                     movimientos.addFirst(new Movimiento(12,derecha,false,false));
                     movimientos.addFirst(new Movimiento(0,abajo,false,true));
                 }
@@ -407,9 +407,11 @@ public class Robot {
         {
             Robot bot=colaRobots.get(i);            
             Punto posActualBot = bot.getPosicionActual();
-            if(!posActualBot.esIgual(pivote.x,pivote.y,pivote.z))
+            /*System.out.println("comparando bot("+bot.getOrdenRobot()+") - "+"("+posActualBot.x+","+posActualBot.y+","+posActualBot.z+")");
+            System.out.println("           comparado con el pivote ("+pivote.x+",0,"+pivote.z+")");*/
+            if(!posActualBot.esIgual(pivote.x,0,pivote.z))
                 return false;
-            if(pivote.x==16&&pivote.z==44)
+            if(abs(pivote.x-16)<=0.001&&abs(pivote.z-44)<=0.001)
             {
                 pivote.x=14;
                 factor=-2;
@@ -483,31 +485,16 @@ public class Robot {
                 }
                 if(abs(movActual.desplazamiento-0.8f)<=0.001||abs(movActual.desplazamiento+0.8f)<=0.001)
                     bot.setAvance(0.005f);
-                else if(movActual.desplazamiento==0)
+                else
+                    bot.setAvance(0.2f);
+                if(!(movActual.desplazamiento==0&&movActual.fin==true))
+                    bot.actuar(movActual.desplazamiento,movActual.direccion,estadoRobot,movActual.fin);   
+                else
                 {
-                    if(movActual.fin)
-                    {
-                        if(isColaRobotOrdenada())
-                        {
-                            Robot ultimoCola = colaRobots.getLast();
-                            float despV=ultimoCola.getPosicionActual().z-bot.getPosicionActual().z;
-                            float despH=ultimoCola.getPosicionActual().x-bot.getPosicionActual().x;
-                            bot.getMovimientos().removeLast();
-                            bot.getMovimientos().addFirst( new Movimiento(despV,bot.getAbajo(),false,false));
-                            if(despH>=0)
-                                bot.getMovimientos().addFirst( new Movimiento(despH,bot.getDerecha(),false,false));
-                            bot.getMovimientos().addFirst(new Movimiento(0,bot.getAbajo(),false,false));
-                        }
-                    }
-                    else   
-                    {
-                        if(isColaRobotOrdenada())
-                        {
-                            Robot ultimoCola = colaRobots.getLast();
+                            Robot ultimoCola = colaRobots.getFirst();
                             float despV=ultimoCola.getPosicionActual().z;
                             float despH=ultimoCola.getPosicionActual().x;
                             Punto nuevaPos=new Punto();
-                            nuevaPos.y=0;
                             if(abs(despH-14)<=0.001)
                             {
                                 nuevaPos.x=despH;
@@ -526,18 +513,19 @@ public class Robot {
                                     nuevaPos.z=despV+2;
                                 }
                             }
-                            bot.setPosicionInicial(nuevaPos);
-                            bot.setPosicionActual(nuevaPos);
                             bot.movimientos.removeLast();
-                            colaRobots.addFirst(bot);
-                            robotsActivos.remove(i);
-                        }   
-                    }
+                            /*System.out.println("Numero de orden1 :" + bot.getOrdenRobot());
+                            System.out.println("cantidad de robots1: "+colaRobots.size());*/
+                            Robot nuevoBot=new Robot(bot.getOrdenRobot(),nuevaPos.x,nuevaPos.z);
+                            robotsActivos.remove(i); 
+                            /*System.out.println("Numero de orden2 :" + colaRobots.getFirst().getOrdenRobot());
+                            System.out.println("cantidad de robots2: "+colaRobots.size());
+                            if(isColaRobotOrdenada())
+                                System.out.println("TODOOOO ESTA BIEEEEEEN!!!!!!!");
+                            else
+                                System.out.println("MIEEEEEERRRRRRRRRRRRDAAAAAAAAAAAAAAAAAA!!!!!!!");*/
+                            break;
                 }
-                else
-                    bot.setAvance(0.2f);
-                if(!(movActual.desplazamiento==0&&movActual.fin==false))
-                    bot.actuar(movActual.desplazamiento,movActual.direccion,estadoRobot,movActual.fin);   
             }
         }
         if(!colaRobots.isEmpty())  //Dibuja los robots inactivas e ordena la cola de Robots
@@ -641,9 +629,9 @@ public class Robot {
                 movimientos.removeLast();       
                  System.out.println("siguiente paso: " + movimientos.getLast().desplazamiento);
              }
-             System.out.println("Pos final actual Robot["+ordenRobot+"] :("+
+             /*System.out.println("Pos final actual Robot["+ordenRobot+"] :("+
                             posicionInicial.x+","+posicionInicial.y+","+posicionInicial.z+") con direccion: "+"("+
-                            dir.x+","+dir.y+","+dir.z+") "); 
+                            dir.x+","+dir.y+","+dir.z+") "); */
              //System.out.println("Posicicion2 actual Robot["+ordenRobot+"] :("+posicionActual.x+","+posicionActual.y+","+posicionActual.z+")");  
         }
         else
