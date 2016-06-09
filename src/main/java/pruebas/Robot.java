@@ -37,20 +37,23 @@ public class Robot {
     //ESTADOS 
     private final int DEJAR_CAJA=0;
     private final int TRAER_CAJA=1;
-    private final int RETORNAR=2;
-    private final int  A_LA_COLA=3;
     
     private final LinkedList<Movimiento> movimientos;  
     private final Motor motor;
     private final Horquilla horq ;
     private float avance  = 0.2f;
-    private float avanceCola  = 0.2f;
+    private float avanceCola  = 0.1f;
     private final int ordenRobot;
     private final Punto posHorquilla;
     private float miRotacion;
+   
+    // Informacion sobre variable miDireccion (Controla hacia donde apunta la horquilla)
+    // miDireccion=-90  (La horquilla apunta a la derecha)
+    // miDireccion=90   (La horquilla apunta a la izquierda)
+    // miDireccion=-180   (La horquilla apunta hacia abajo)
+    // miDireccion=180   (La horquilla apunta hacia arriba)  
     private float miDireccion;
-    private final boolean enRetroceso;
-       
+    
     private Punto posicionActual;    
     private Punto posicionInicial;
     private Punto direccion;
@@ -76,14 +79,13 @@ public class Robot {
         movimientos=new LinkedList<>();
         motor=new Motor();
         horq=new Horquilla();
-        enRetroceso=false;
         marcar(posicionActual, true);    
         miRotacion = 0.0f;
         miDireccion=0.0f;
         colaRobots.addFirst((Robot)this);
-        if (x == 14)
+        if (abs(x-14)<=0.001)
         {
-            if (z != 44)
+            if (!(abs(z-44)<=0.001))
             {
                 direccion=abajo;
                 miDireccion=180.0f;
@@ -95,7 +97,7 @@ public class Robot {
             }
         }
         else {
-            direccion=(arriba);
+            direccion=arriba;
             miRotacion = -180.0f;
             miDireccion=0.0f;
         }
@@ -153,20 +155,7 @@ public class Robot {
             c[(int)p.x]='x';
         }
             local[0][(int)p.z]=new String(c);
-    }
-    public void sumar (Punto p, float t, Punto q)
-    {
-        p.x += (t * q.x);
-        p.y += (t * q.y);
-        p.z += (t * q.z);
-    }
-    public Punto mult (float m, Punto p)
-    {
-        p.x = m * p.x;
-        p.y = m * p.y;
-        p.z = m * p.z;
-        return p;
-    }
+    }    
     //ESTADOS DE CAJAS EN LOS ESTANTES
         //Vacio =  "No hay caja en esa prosicion(Espacio libre para ocupara caja)"
         // 0 = "Hay una caja disponible para retirar en esa posicion"
@@ -224,11 +213,6 @@ public class Robot {
         }
         return (new DescritorEstante(encontrado,lado,posEstadoCaja,piso));
     }
-    // Informacion sobre variable miDireccion (Controla hacia donde apunta la horquilla)
-    // miDireccion=-90  (La horquilla apunta a la derecha)
-    // miDireccion=90   (La horquilla apunta a la izquierda)
-    // miDireccion=-180   (La horquilla apunta hacia abajo)
-    // miDireccion=180   (La horquilla apunta hacia arriba)
     private void calcularRuta(int estanteObj)
     {
         DescritorEstante desEstante=buscarEspacioEstante(estanteObj);
@@ -408,8 +392,6 @@ public class Robot {
         {
             Robot bot=colaRobots.get(i);            
             Punto posActualBot = bot.getPosicionActual();
-            /*System.out.println("comparando bot("+bot.getOrdenRobot()+") - "+"("+posActualBot.x+","+posActualBot.y+","+posActualBot.z+")");
-            System.out.println("           comparado con el pivote ("+pivote.x+",0,"+pivote.z+")");*/
             if(!posActualBot.esIgual(pivote.x,0,pivote.z))
                 return false;
             if(abs(pivote.x-16)<=0.001&&abs(pivote.z-44)<=0.001)
@@ -423,34 +405,101 @@ public class Robot {
         }
         return true;
     }
+    
+    static Movimiento correctorPosRobot(int posRobot)//Verifica si la cola de robots esta ordenada
+    {
+        Punto pivote=new Punto(16,0,30);
+        int factor=2;
+        float desp=0;
+        Robot botPivote = colaRobots.get(posRobot);
+        Punto ubRobot = botPivote.getPosicionInicial();
+        Punto dirRobot= botPivote.getDireccion();
+        for (int i = colaRobots.size()-1; i >=0; i--) 
+        {
+            Robot bot=colaRobots.get(i);            
+            Punto posActualBot = bot.getPosicionInicial();
+            /*System.out.println("comparando bot("+bot.getOrdenRobot()+") - "+"("+posActualBot.x+","+posActualBot.y+","+posActualBot.z+")");
+            System.out.println("           comparado con el pivote ("+pivote.x+",0,"+pivote.z+")");*/
+            if(i==posRobot &&!posActualBot.esIgual(pivote.x,0,pivote.z))
+            {
+                Punto dir=null;
+                if(abs(ubRobot.x-14)<=0.001)
+                {
+                    if(pivote.x==14)
+                    {
+                        desp=pivote.z-ubRobot.z;
+                        dir=bot.getAbajo();
+                        bot.setDireccion(dir);
+                    }
+                    else if(pivote.x==16)
+                    {                        
+                        if(abs(pivote.z-posActualBot.z)<=0.001)
+                        {
+                            desp=2;
+                            dir=bot.getDerecha();
+                            bot.setDireccion(dir);
+                        }
+                        else
+                        {
+                            desp=2;
+                            //desp=44-ubRobot.z;
+                            dir=bot.getAbajo();
+                            bot.setDireccion(dir);
+                        }
+                    }
+                }
+                else if(abs(ubRobot.x-16)<=0.001)
+                {
+                    desp=ubRobot.z-pivote.z;
+                    dir=bot.getArriba();
+                    bot.setDireccion(dir);
+                }
+                return new Movimiento(desp,dir,false,true);
+            }
+            if(abs(pivote.x-16)<=0.001&&abs(pivote.z-44)<=0.001)
+            {
+                pivote.x=14;
+                factor=-2;
+            }
+            else
+                pivote.z=pivote.z+factor;
+                
+        }
+        return new Movimiento(0,dirRobot,false,true);
+    }
     // Informacion sobre variable miDireccion (Controla hacia donde apunta la horquilla)
         // miDireccion=-90  (La horquilla apunta a la derecha)
         // miDireccion=90   (La horquilla apunta a la izquierda)
         // miDireccion=-180   (La horquilla apunta hacia abajo)
-        // miDireccion=180   (La horquilla apunta hacia arriba)
+        // miDireccion=0   (La horquilla apunta hacia arriba)
     static void controlarRobots(boolean goRobot,int estado,int estante)//Controla todos los roboys
     {
         if(goRobot)
         {
             if(!colaRobots.isEmpty())
             {
-                Robot botActivado=colaRobots.removeLast();
-                //ACA SE CALCULARAN LOS MOVIMIENTOS NECESARIOS PARA TRIPULAR EL BOT
-                if(estado==0)
-                    botActivado.calcularRuta(estante);
-                if(!botActivado.getMovimientos().isEmpty())
-                {
-                    if(estado==0)//0
-                        botActivado.tengoCaja=true;
-                    else if(estado==1)//1
-                        botActivado.tengoCaja=false; 
-                    robotsActivos.addFirst(new OperacionRobot(botActivado,estado,estante));
-                    System.out.println("nMovimientos : "+botActivado.getMovimientos().size());
-                }
-                else
-                {
-                    colaRobots.addLast(botActivado);
-                }
+                    if(!isColaRobotOrdenada())              
+                        System.out.println("Espera mano que la cola se ordene :v");
+                    else
+                    {
+                        Robot botActivado=colaRobots.removeLast();
+                        //ACA SE CALCULARAN LOS MOVIMIENTOS NECESARIOS PARA TRIPULAR EL BOT
+                        if(estado==0)
+                            botActivado.calcularRuta(estante);
+                        if(!botActivado.getMovimientos().isEmpty())
+                        {
+                            if(estado==0)//0
+                                botActivado.tengoCaja=true;
+                            else if(estado==1)//1
+                                botActivado.tengoCaja=false; 
+                            robotsActivos.addFirst(new OperacionRobot(botActivado,estado,estante));
+                            System.out.println("nMovimientos : "+botActivado.getMovimientos().size());
+                        }
+                        else
+                        {
+                            colaRobots.addLast(botActivado);
+                        }
+                    }
             }
             else
                 System.out.println("Todos los robots estan ocupados!! Aguarde un momento porfavor :D");
@@ -488,146 +537,62 @@ public class Robot {
                     bot.setAvance(0.005f);
                 else
                     bot.setAvance(0.2f);
-                if(movActual.desplazamiento==0)
-                {
-                    if(movActual.fin)
-                    {
-                        if(isColaRobotOrdenada())
-                        {
-                            Robot ultimoCola = colaRobots.getFirst();
-                            float despV=ultimoCola.getPosicionActual().z;
-                            float despH=ultimoCola.getPosicionActual().x; 
-                            if(abs(despH-14)<=0.001)
-                            {
-                                despV-=32;
-                                despH=0;
-                            }
-                            else if(abs(despH-16)<=0.001)
-                            {
-                                if(abs(despV-44)<=0.001)
-                                {
-                                    despV-=32;
-                                    despH=0;
-                                }
-                                else
-                                {
-                                    despV-=32;
-                                    despH=2;
-                                }
-                            }
-                            System.out.println("Mover x: " + despH + " a la derecha");
-                            System.out.println("Mover z: " + despV + " hacia abajo");
-                            /*Robot ultimoCola = colaRobots.getFirst();
-                            float despV=ultimoCola.getPosicionActual().z-bot.getPosicionActual().z-2;
-                            float despH=ultimoCola.getPosicionActual().x-bot.getPosicionActual().x;*/
-                            bot.getMovimientos().removeLast();
-                            if(despV>=0)
-                                bot.getMovimientos().addFirst( new Movimiento(despV,bot.getAbajo(),false,false));
-                            if(despH>=0)
-                                bot.getMovimientos().addFirst( new Movimiento(despH,bot.getDerecha(),false,false));
-                            movActual.direccion=bot.getAbajo();
-                            movActual.fin=false;
-                            bot.getMovimientos().addFirst(new Movimiento(0,bot.getAbajo(),false,false));
-                        }
-                    }
-                    else   
-                    {
-                        if(isColaRobotOrdenada())
-                        {
-                            Robot ultimoCola = colaRobots.getFirst();
-                            float despV=ultimoCola.getPosicionActual().z;
-                            float despH=ultimoCola.getPosicionActual().x;
-                            Punto nuevaPos=new Punto();
-                            if(abs(despH-14)<=0.001)
-                            {
-                                nuevaPos.x=despH;
-                                nuevaPos.z=despV-2;
-                            }
-                            else if(abs(despH-16)<=0.001)
-                            {
-                                if(abs(despV-44)<=0.001)
-                                {
-                                    nuevaPos.x=despH-2;
-                                    nuevaPos.z=despV;
-                                }
-                                else
-                                {
-                                    nuevaPos.x=despH;
-                                    nuevaPos.z=despV+2;
-                                }
-                            }
-                            bot.movimientos.removeLast();
-                            Robot nuevoBot=new Robot(bot.getOrdenRobot(),nuevaPos.x,nuevaPos.z);
-                            robotsActivos.remove(i); 
-                            //break;  
-                        }
-                    }
-                }
-
-                if(!(movActual.desplazamiento==0&&movActual.fin==false))
+                if(!(movActual.desplazamiento==0&&movActual.fin==true))
                     bot.actuar(movActual.desplazamiento,movActual.direccion,estadoRobot,movActual.fin);   
+                else
+                {
+                    Robot nuevoBot=new Robot(bot.getOrdenRobot(),14,30);
+                    robotsActivos.remove(i);
+                }
             }
         }
         if(!colaRobots.isEmpty())  //Dibuja los robots inactivas e ordena la cola de Robots
         {
             for (int i=colaRobots.size()-1;i>=0;i--) 
-            {
-                Robot bot=colaRobots.get(i);    
-                Punto posInicialBot = bot.getPosicionInicial();
-                float factor=2;
-                if(!isColaRobotOrdenada())
+            {  
+                Robot bot=colaRobots.get(i);   
+                //ACA SE MANDAN A EJECUTAR LOS MOVIMIENTOS DEL BOT PREVIAMENTE CALCULADOS
+                Movimiento movActual = correctorPosRobot(i);
+                if(movActual.direccion.esIgual(0, 0, -1))
                 {
-                    if (abs(posInicialBot.x-14)<=0.001)
-                    {                        
-                        if (!(abs(posInicialBot.z-44)<=0.001))//0
-                        {
-                            //posInicialBot.z=posInicialBot.z+2.0f;                          
-                            if(abs(posInicialBot.z-42)<=0.001)
-                            {
-                                bot.setMiDireccion(-90.0f);
-                                bot.setDireccion(bot.getAbajo());
-                                bot.animarRobotCola(factor); 
-                                bot.setDireccion(bot.getDerecha());
-                            }
-                            else
-                            {
-                                bot.setMiDireccion(-180.0f);
-                                bot.setDireccion(bot.getAbajo());
-                                bot.animarRobotCola(factor); 
-                            }
-                        }
-                        else //if(posActualBot.z>42)//1
-                        {
-                            //posInicialBot.x=posInicialBot.x+2.0f;
-                            bot.setMiDireccion(0.0f);
-                            bot.setMiRotacion(-90.0f);    
-                            bot.setDireccion(bot.getDerecha());
-                            bot.animarRobotCola(factor); 
-                            bot.setDireccion(bot.getArriba());
-                        }
-                    }
-                    else //2
+                    bot.setMiDireccion(0);
+                    bot.setMiRotacion(-180);
+                    bot.animarRobotCola(movActual.desplazamiento,movActual.direccion);
+                }
+                else if(movActual.direccion.esIgual(0, 0, 1))
+                {
+                    bot.setMiDireccion(180);
+                    bot.setMiRotacion(-180);
+                    bot.animarRobotCola(movActual.desplazamiento,movActual.direccion); 
+                    if(abs(bot.getPosicionInicial().z-44)<=0.001)
                     {
-                        //posInicialBot.z=posInicialBot.z-2.0f;
-                        bot.setMiDireccion(0.0f);
-                        bot.setMiRotacion(-180.0f);
-                        bot.setDireccion(bot.getArriba());
-                        bot.animarRobotCola(factor);                        
-                    }                                                       
-                }   
-                else
+                        bot.setMiDireccion(-90);
+                        bot.setMiRotacion(-90);
+                        bot.setDireccion(bot.getDerecha());                                
+                    }
+                }
+                else if(movActual.direccion.esIgual(1, 0, 0))
                 {
-                    bot.setPosicionInicial(bot.getPosicionActual());        
-                    /*Punto posIni = bot.getPosicionInicial();
-                    Punto dir = bot.getDireccion();
-                    System.out.println("Pos actual Robot["+bot.getOrdenRobot()+"] :("+
-                            posIni.x+","+posIni.y+","+posIni.z+") con direccion: "+"("+
-                            dir.x+","+dir.y+","+dir.z+") "); */
-                    bot.animarRobotCola(0); 
-                } 
+                    bot.setMiDireccion(-90);
+                    bot.setMiRotacion(-90);
+                    bot.animarRobotCola(movActual.desplazamiento,movActual.direccion); 
+                    if(abs(bot.getPosicionInicial().x-16)<=0.001)
+                    {
+                        bot.setMiDireccion(0);
+                        bot.setMiRotacion(-180);
+                        bot.setDireccion(bot.getArriba());    
+                    }
+                        
+                }
+                /*System.out.println("Datos actual Robot["+bot.getOrdenRobot()+"] :("+
+                            bot.getPosicionInicial().x+","+bot.getPosicionInicial().y+","+bot.getPosicionInicial().z+") con direccion: "+"("+
+                            bot.getDireccion().x+","+bot.getDireccion().y+","+bot.getDireccion().z+") "); 
+                System.out.println("          Movimiento Robot["+bot.getOrdenRobot()+"] : "+movActual.desplazamiento+" con direccion: "+"("+
+                            movActual.direccion.x+","+movActual.direccion.y+","+movActual.direccion.z+") "); */
             }
+                
         }
-    }   
+    }  
     public void actuar(float pasos,Punto dir,int operacion,boolean isFinal)   
     {
         float pos=0;  
@@ -639,7 +604,7 @@ public class Robot {
         modelMatrix.push();    
         modelMatrix.translate(posicionActual.x,posicionActual.y,posicionActual.z);
         modelMatrix.scale(0.6f, 0.6f, 0.6f);
-        motor.avanzar(miRotacion, enRetroceso);
+        motor.avanzar(miRotacion);
         modelMatrix.pop();
         posHorquilla.inicio(posicionActual.x, posicionActual.y,posicionActual.z);
         modelMatrix.push();
@@ -648,7 +613,7 @@ public class Robot {
         modelMatrix.pop();    
         Punto ir=new Punto(posicionInicial.x, posicionInicial.y,posicionInicial.z);
         ir.sumar(pasos,dir);  
-        System.out.println("Destino Robot["+ordenRobot+"] :("+ir.x+","+ir.y+","+ir.z+")");  
+        //System.out.println("Destino Robot["+ordenRobot+"] :("+ir.x+","+ir.y+","+ir.z+")");  
         if(posicionActual.esIgual(ir.x,ir.y,ir.z))
         {
              posicionActual = ir;    
@@ -667,7 +632,7 @@ public class Robot {
                     nivelEstante=1;
                 }
                 movimientos.removeLast();       
-                 System.out.println("siguiente paso: " + movimientos.getLast().desplazamiento);
+                 //System.out.println("siguiente paso: " + movimientos.getLast().desplazamiento);
              }
              /*System.out.println("Pos final actual Robot["+ordenRobot+"] :("+
                             posicionInicial.x+","+posicionInicial.y+","+posicionInicial.z+") con direccion: "+"("+
@@ -679,43 +644,46 @@ public class Robot {
             if(pasos<0)
                 avance=-avance;           
             posicionActual.sumar(avance, dir);  
-             System.out.println("Pos actual Robot["+ordenRobot+"] :("+
+           /*  System.out.println("Pos actual Robot["+ordenRobot+"] :("+
                             posicionActual.x+","+posicionActual.y+","+posicionActual.z+") con direccion: "+"("+
-                            dir.x+","+dir.y+","+dir.z+") ");            
+                            dir.x+","+dir.y+","+dir.z+") ");  */          
             //System.out.println("Posicicion1 actual Robot["+ordenRobot+"] :("+posicionActual.x+","+posicionActual.y+","+posicionActual.z+")");             
         }
     }
-    public void animarRobotCola(float pasos)  
+    public void animarRobotCola(float pasos,Punto dir)   
     {
-        float pos=0;
+        float pos=0;  
         modelMatrix.push();    
         modelMatrix.translate(posicionActual.x,posicionActual.y,posicionActual.z);
         modelMatrix.scale(0.6f, 0.6f, 0.6f);
-        motor.avanzar(miRotacion, enRetroceso);
+        motor.avanzar(miRotacion);
         modelMatrix.pop();
-        
         posHorquilla.inicio(posicionActual.x, posicionActual.y,posicionActual.z);
         modelMatrix.push();
         modelMatrix.translate(posHorquilla.x,posHorquilla.y,posHorquilla.z);      
         horq.avanzar(-360.0f+miDireccion, tengoCaja,pos);
-        modelMatrix.pop();
-
-        //Punto ir= this.getPosicionInicial();
+        modelMatrix.pop();    
         Punto ir=new Punto(posicionInicial.x, posicionInicial.y,posicionInicial.z);
-        //Punto ir=posicionInicial;
-        ir.sumar(pasos,this.getDireccion());  
+        ir.sumar(pasos,dir);  
         //System.out.println("Destino Robot["+ordenRobot+"] :("+ir.x+","+ir.y+","+ir.z+")");  
         if(posicionActual.esIgual(ir.x,ir.y,ir.z))
         {
-             posicionActual = ir;          
+             posicionActual = ir;    
+             posicionInicial.inicio(ir.x, ir.y, ir.z);
+             /*System.out.println("Pos final actual Robot["+ordenRobot+"] :("+
+                            posicionInicial.x+","+posicionInicial.y+","+posicionInicial.z+") con direccion: "+"("+
+                            dir.x+","+dir.y+","+dir.z+") "); */
              //System.out.println("Posicicion2 actual Robot["+ordenRobot+"] :("+posicionActual.x+","+posicionActual.y+","+posicionActual.z+")");  
         }
         else
-        {
-            posicionActual.sumar(avanceCola, direccion);    
+        {         
+            posicionActual.sumar(avanceCola, dir);  
+           /*  System.out.println("Pos actual Robot["+ordenRobot+"] :("+
+                            posicionActual.x+","+posicionActual.y+","+posicionActual.z+") con direccion: "+"("+
+                            dir.x+","+dir.y+","+dir.z+") ");  */          
             //System.out.println("Posicicion1 actual Robot["+ordenRobot+"] :("+posicionActual.x+","+posicionActual.y+","+posicionActual.z+")");             
         }
-    }
+    }   
     public Punto getPosicionActual() {
         return posicionActual;
     }
@@ -811,52 +779,7 @@ public class Robot {
         public Motor() {
             angulo = (float) (((avance / radio)*180)/PI + 1.5);
         }
-
-/**
-        void girar(float giro)
-        {
-            modelMatrix.push();
-            modelMatrix.bind();
-            carcasa.draw();
-            modelMatrix.pop();
-
-            modelMatrix.push();
-            modelMatrix.rotate(giro, 0, 1, 0);
-            modelMatrix.bind();
-            eje.draw();
-            tubo.draw();
-            modelMatrix.pop();
-
-            modelMatrix.push();
-            modelMatrix.translate(-2.5f,1,-2.5f);
-            modelMatrix.rotate(giro, 0, 1, 0);
-            modelMatrix.bind();
-            rueda.draw();
-            modelMatrix.pop();
-
-            modelMatrix.push();
-            modelMatrix.translate(-2.5f,1,2.5f);
-            modelMatrix.rotate(giro, 0, 1, 0);
-            modelMatrix.bind();
-            rueda.draw();
-            modelMatrix.pop();;
-
-            modelMatrix.push();
-            modelMatrix.translate(2.5f,1,-2.5f);
-            modelMatrix.rotate(giro, 0, 1, 0);
-            modelMatrix.bind();
-            rueda.draw();
-            modelMatrix.pop();
-
-            modelMatrix.push();
-            modelMatrix.translate(2.5f,1,2.5f);
-            modelMatrix.rotate(giro, 0, 1, 0);
-            modelMatrix.bind();
-            rueda.draw();
-            modelMatrix.pop();
-        }
-*/
-        void avanzar(float alfa, boolean atras)
+        void avanzar(float alfa)
         {
             modelMatrix.push();
             modelMatrix.bind();
@@ -864,9 +787,9 @@ public class Robot {
             modelMatrix.pop();
             
             modelMatrix.push();
-            if (atras)
+            /*if (atras)
                 modelMatrix.rotate(-alfa, 0, 1, 0);
-            else
+            else*/
                 modelMatrix.rotate(alfa, 0, 1, 0);    
             modelMatrix.translate(0,0.3f,0.0f);
             modelMatrix.bind();
@@ -920,17 +843,6 @@ public class Robot {
     }
     public class Horquilla
     {
-        /*
-        void girar(float giro, boolean conCaja)
-        {
-            modelMatrix.push();
-            modelMatrix.rotate(giro, 0, 1, 0);
-            modelMatrix.bind();
-            horquilla.draw();
-            modelMatrix.pop();
-        }
-        */
-
         void avanzar(float alfa, boolean conCaja,float pos)
         {
             modelMatrix.push();

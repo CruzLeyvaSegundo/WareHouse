@@ -42,4 +42,10 @@ public class Punto {
         y += (t * q.y);
         z += (t * q.z);
     }
+    public void mult (float m, Punto p)
+    {
+        x = m * p.x;
+        y = m * p.y;
+        z = m * p.z;
+    }
 }
