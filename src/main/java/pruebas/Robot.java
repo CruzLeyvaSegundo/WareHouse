@@ -85,8 +85,8 @@ public class Robot {
         {
             if (z != 44)
             {
-                direccion=arriba;
-                miDireccion=-180.0f;
+                direccion=abajo;
+                miDireccion=180.0f;
             }
             else {
                 direccion=derecha;
@@ -97,6 +97,7 @@ public class Robot {
         else {
             direccion=(arriba);
             miRotacion = -180.0f;
+            miDireccion=0.0f;
         }
         System.out.println("Configurado robot: "+n+", en la posicicion ("+posicionActual.x+","+posicionActual.y+","+posicionActual.z+")");  
     }
@@ -487,10 +488,52 @@ public class Robot {
                     bot.setAvance(0.005f);
                 else
                     bot.setAvance(0.2f);
-                if(!(movActual.desplazamiento==0&&movActual.fin==true))
-                    bot.actuar(movActual.desplazamiento,movActual.direccion,estadoRobot,movActual.fin);   
-                else
+                if(movActual.desplazamiento==0)
                 {
+                    if(movActual.fin)
+                    {
+                        if(isColaRobotOrdenada())
+                        {
+                            Robot ultimoCola = colaRobots.getFirst();
+                            float despV=ultimoCola.getPosicionActual().z;
+                            float despH=ultimoCola.getPosicionActual().x; 
+                            if(abs(despH-14)<=0.001)
+                            {
+                                despV-=32;
+                                despH=0;
+                            }
+                            else if(abs(despH-16)<=0.001)
+                            {
+                                if(abs(despV-44)<=0.001)
+                                {
+                                    despV-=32;
+                                    despH=0;
+                                }
+                                else
+                                {
+                                    despV-=32;
+                                    despH=2;
+                                }
+                            }
+                            System.out.println("Mover x: " + despH + " a la derecha");
+                            System.out.println("Mover z: " + despV + " hacia abajo");
+                            /*Robot ultimoCola = colaRobots.getFirst();
+                            float despV=ultimoCola.getPosicionActual().z-bot.getPosicionActual().z-2;
+                            float despH=ultimoCola.getPosicionActual().x-bot.getPosicionActual().x;*/
+                            bot.getMovimientos().removeLast();
+                            if(despV>=0)
+                                bot.getMovimientos().addFirst( new Movimiento(despV,bot.getAbajo(),false,false));
+                            if(despH>=0)
+                                bot.getMovimientos().addFirst( new Movimiento(despH,bot.getDerecha(),false,false));
+                            movActual.direccion=bot.getAbajo();
+                            movActual.fin=false;
+                            bot.getMovimientos().addFirst(new Movimiento(0,bot.getAbajo(),false,false));
+                        }
+                    }
+                    else   
+                    {
+                        if(isColaRobotOrdenada())
+                        {
                             Robot ultimoCola = colaRobots.getFirst();
                             float despV=ultimoCola.getPosicionActual().z;
                             float despH=ultimoCola.getPosicionActual().x;
@@ -514,18 +557,15 @@ public class Robot {
                                 }
                             }
                             bot.movimientos.removeLast();
-                            /*System.out.println("Numero de orden1 :" + bot.getOrdenRobot());
-                            System.out.println("cantidad de robots1: "+colaRobots.size());*/
                             Robot nuevoBot=new Robot(bot.getOrdenRobot(),nuevaPos.x,nuevaPos.z);
                             robotsActivos.remove(i); 
-                            /*System.out.println("Numero de orden2 :" + colaRobots.getFirst().getOrdenRobot());
-                            System.out.println("cantidad de robots2: "+colaRobots.size());
-                            if(isColaRobotOrdenada())
-                                System.out.println("TODOOOO ESTA BIEEEEEEN!!!!!!!");
-                            else
-                                System.out.println("MIEEEEEERRRRRRRRRRRRDAAAAAAAAAAAAAAAAAA!!!!!!!");*/
-                            break;
+                            //break;  
+                        }
+                    }
                 }
+
+                if(!(movActual.desplazamiento==0&&movActual.fin==false))
+                    bot.actuar(movActual.desplazamiento,movActual.direccion,estadoRobot,movActual.fin);   
             }
         }
         if(!colaRobots.isEmpty())  //Dibuja los robots inactivas e ordena la cola de Robots
