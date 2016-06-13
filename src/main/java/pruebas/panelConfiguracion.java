@@ -61,8 +61,13 @@ public class panelConfiguracion extends javax.swing.JPanel {
 
         jLabel1.setText("Operaçao:");
 
-        operacion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Dejar caja", "Traer Caja" }));
+        operacion.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Deixar caixa", "Trazer caixa" }));
         operacion.setDoubleBuffered(true);
+        operacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                operacionActionPerformed(evt);
+            }
+        });
 
         jLabel2.setText("Nº Estante:");
 
@@ -182,19 +187,21 @@ public class panelConfiguracion extends javax.swing.JPanel {
                                         .addGap(0, 0, Short.MAX_VALUE)))
                                 .addGap(24, 24, 24))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                         .addGap(26, 26, 26)
                                         .addComponent(abajo, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(10, 10, 10)
+                                        .addComponent(operacion, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                         .addGap(10, 10, 10)
-                                        .addComponent(operacion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(nEstante, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 75, Short.MAX_VALUE)))
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(nEstante, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                                 .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -254,10 +261,8 @@ public class panelConfiguracion extends javax.swing.JPanel {
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton4)
-                .addContainerGap(194, Short.MAX_VALUE))
+                .addContainerGap(253, Short.MAX_VALUE))
         );
-
-        jButton3.getAccessibleContext().setAccessibleName("der");
     }// </editor-fold>//GEN-END:initComponents
 
     private void nEstanteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nEstanteActionPerformed
@@ -267,7 +272,7 @@ public class panelConfiguracion extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         int op;
         int estante;
-        if(operacion.getSelectedItem().toString().compareToIgnoreCase("Dejar caja")==0)
+        if(operacion.getSelectedItem().toString().compareToIgnoreCase("Deixar caixa")==0)
             op=0;
         else
             op=1;
@@ -325,6 +330,10 @@ public class panelConfiguracion extends javax.swing.JPanel {
         escena.beta=0;
         escena.delta=0;        // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void operacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operacionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_operacionActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
