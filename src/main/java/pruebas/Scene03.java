@@ -52,14 +52,13 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   
   private final Light light;
   private final String[][] local;
-  private float alpha;
-  private float beta;
-  private float delta;
+  public float alpha;
+  public float beta;
+  public float delta;
   private int height;
   private int width;
-  private Punto vista;
-  private Punto dir;
-  private final Punto posFin;
+  public Punto vista;
+  public Punto dir;
   
   private final int DEJAR_CAJA=0;
   private final int TRAER_CAJA=1;
@@ -67,10 +66,10 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   private final int LARGO = 47;
   private final int ANCHO = 31;//29
   private final int ALTURA = 3;
-  private boolean band=false;
-  private boolean goRobot=false;
-  private int estadoRobot=1;
-  private int estanteObjetivo=1;
+  
+  public  boolean goRobot=false;
+  public  int estadoRobot=1;
+  public  int estanteObjetivo=1;
   //Robot
   private final int nRobot=16;
   private final Robot[] robot;
@@ -95,11 +94,12 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
         material=new Material();
         
         QUAD_VERTICES=new float[12];
-        alpha = 0;
+        alpha = 20;
         beta = 0;
-        vista=new Punto(14,12,48);
-        dir = new Punto(14,2,33);
-        posFin=new Punto(15,0,30);     
+        vista=new Punto(15.5f,12,58);
+        dir = new Punto(16,2,43);
+        //vista=new Punto(14,12,48);
+        //dir = new Punto(14,2,33);
         square=new Square(QUAD_VERTICES);
         this.local = new String[][]{
                             {
@@ -323,8 +323,8 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
   }
  private void crearRobots()
  {
-     robot[0]=new Robot(0,16.0f,30.0f);
-     robot[1]=new Robot(1,16.0f,32.0f);
+    robot[0]=new Robot(0,16.0f,30.0f);
+    robot[1]=new Robot(1,16.0f,32.0f);
     robot[2]=new Robot(2,16.0f,34.0f);
     robot[3]=new Robot(3,16.0f,36.0f);
     robot[4]=new Robot(4,16.0f,38.0f);
@@ -485,6 +485,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     // Limpa o frame buffer com a cor definida
     gl.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
 
+    gl.glViewport(135, 0, width, height);
     //Proyeccion Perspectiva
     projectionMatrix.loadIdentity();
     projectionMatrix.perspective(60.0f+delta,width/height, 2, 600);
@@ -499,8 +500,6 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
     //Dibujo de escena Almacen
     modelMatrix.loadIdentity();
     cargarLocal();
-    //for (int i = 0 ; i < nRobot ; i++)
-    //robot[0].actuar(posFin, band, girar);
     Robot.controlarRobots(goRobot,estadoRobot,estanteObjetivo);
     if(goRobot=true)
         goRobot=false;
@@ -525,40 +524,11 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
      KeyListener listener= new KeyListener(){
             @Override
             public void keyTyped(KeyEvent e) {
+                System.out.println("sopecha1");
 	    }        
             @Override
             public void keyPressed(KeyEvent e) {
-              switch (e.getKeyChar()) {
-                case '-'://faz zoom-in
-                    if(delta<50)
-                      delta = delta + 4.0f;
-                    break;
-                case '+'://faz zoom-out
-                    if(delta>-60)
-                      delta = delta - 4.0f;
-                    break;
-                case 'w'://
-                    vista.z-=1;
-                    dir.z-=1;
-                    break;
-                case 's'://
-                    vista.z+=1;
-                    dir.z+=1;
-                    break;
-                case 'a'://
-                    vista.x-=1;
-                    dir.x-=1;
-                    break;
-                case 'd'://
-                    vista.x+=1;
-                    dir.x+=1;
-                    break;
-                case 'n'://
-                    band=true;
-                    break;
-                case 'm'://
-                    band=false;                
-                    break;
+              switch (e.getKeyChar()) {        
                 case 'z'://
                     vista.y+=1;
                     dir.y+=1;
@@ -566,69 +536,10 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                 case 'x'://
                     vista.y-=1;
                     dir.y-=1;
-                    break;
-                case 'c': // CAMBIAR ESTADO DE ACTIVACION DE ROBOT
-                    if(estadoRobot==DEJAR_CAJA)
-                        estadoRobot=TRAER_CAJA;
-                    else
-                        estadoRobot=DEJAR_CAJA;
-                    break;     
-           /// Estante objetico del 1 al 6 = de 'r' hasta 'o' segun la ubicacion en el teclado horizontalmente         
-                case 'r': 
-                    goRobot=true;
-                    estanteObjetivo=1;
-                    break;
-                case 't': 
-                    goRobot=true;
-                    estanteObjetivo=2;
-                    break; 
-                case 'y': 
-                    goRobot=true;
-                    estanteObjetivo=3;
-                    break;
-                case 'u': 
-                    goRobot=true;
-                    estanteObjetivo=4;
-                    break;  
-                case 'i': 
-                    goRobot=true;
-                    estanteObjetivo=5;
-                    break;
-                case 'o': 
-                    goRobot=true;
-                    estanteObjetivo=6;
-                    break;  
-            /// Estante objetico del 7 al 12 = de 'f' hasta 'l' segun la ubicacion en el teclado horizontalmente         
-                case 'f': 
-                    goRobot=true;
-                    estanteObjetivo=7;
-                    break;
-                case 'g': 
-                    goRobot=true;
-                    estanteObjetivo=8;
-                    break; 
-                case 'h': 
-                    goRobot=true;
-                    estanteObjetivo=9;
-                    break;
-                case 'j': 
-                    goRobot=true;
-                    estanteObjetivo=10;
-                    break;  
-                case 'k': 
-                    goRobot=true;
-                    estanteObjetivo=11;
-                    break;
-                case 'l': 
-                    goRobot=true;
-                    estanteObjetivo=12;
-                    break;       
-                //FIN ESTANTE OBJETIVO
-                case '1'://Go robot
-                    goRobot=true;
-                    break;                   
+                    break;               
                 case '8'://
                     alpha+=2;
+                    System.out.println("alpha: "+alpha);
                     break;
                 case '2'://
                     alpha-=2;
@@ -640,11 +551,12 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
                     beta-=2;
                     break;
                 case '5'://
-                    vista=new Punto(14,12,48);
-                    dir = new Punto(14,2,33);
-                    alpha=0;
+
+                    vista=new Punto(15.5f,12,58);
+                    dir = new Punto(16,2,43);
+                    alpha=20;
                     beta=0;
-                    delta=60.0f;
+                    delta=0;
                     break;
                 default:
                        break;
@@ -652,6 +564,7 @@ public class Scene03 extends KeyAdapter implements GLEventListener{
             }
 	    @Override
 	    public void keyReleased(KeyEvent e) {
+                System.out.println("sospecha2");
 	    }            
      };
      return listener;

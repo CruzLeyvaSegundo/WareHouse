@@ -190,7 +190,7 @@ public class Robot {
                     {
                         for(int k=rangoH1;k<=rangoH2;k++) 
                         {
-                            for(int l=rangoV1;l<=rangoV2;l++) 
+                            for(int l=rangoV2;l>=rangoV1;l--) 
                             {
                                 if(local[p][l].charAt(k)==cBuscado)
                                 {
